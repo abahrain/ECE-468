@@ -5,9 +5,8 @@ public class Micro
 {
   public static void main(String[] args)
   {
-      System.out.println("Reading File from Java code");
       //Name of the file
-      String fileName="fibonacci.micro";
+      String fileName="args[0]";
       try{
 
           //Create object of FileReader
