@@ -1,2 +1,2 @@
-grammer Micro_Scan
+grammar Micro_Scan
 
