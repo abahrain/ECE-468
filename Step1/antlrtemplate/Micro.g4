@@ -41,7 +41,8 @@ OPERATOR
 	;
 	
 /*STRINGLITERAL
-	: ['"'](!['\n'|'\r'])+['"']
+	: ('"')(~('\n'|'\r'))*('"')
+	//: ('"')(~('\n'|'\r'))*?('"')
 	;
 */
 
@@ -51,9 +52,10 @@ INTLITERAL
 
 FLOATLITERAL
 	: [0-9]*['.'][0-9]*
-	// : [0-9]*?['.'][0-9]*  What is the difference between laxy and greedy?
+	// : [0-9]*?['.'][0-9]*  What is the difference between lazy and greedy?
 	;
 	
 SPACE: (' ' | '\n' | '\t' | '\r' | '\f')+ -> skip;
+//SPACE: (' '|'\\'.)+ -> skip;
 
 COMMENT: '--'(~('\n'|'\r'))* -> skip;
