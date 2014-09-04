@@ -14,7 +14,7 @@ public class Micro
       {
           System.out.println("Token Type: "+Micro_scan.tokenNames[t.getType()]);
           System.out.println("Value: "+t.getText());
-	  t = lex.nextToken();
+	  Token t = lex.nextToken();
       }
   }
 }
