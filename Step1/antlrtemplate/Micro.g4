@@ -1,4 +1,4 @@
-grammar Micro_Scan;
+grammar Micro;
 
 KEYWORD
 	: 'PROGRAM'
