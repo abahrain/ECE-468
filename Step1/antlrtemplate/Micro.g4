@@ -55,3 +55,5 @@ FLOATLITERAL
 	;
 	
 SPACE: (' ' | '\n' | '\t' | '\r' | '\f')+ -> skip;
+
+COMMENT: '--'(~('\n'|'\r'))* -> skip;
