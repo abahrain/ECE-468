@@ -21,7 +21,7 @@ public class Micro
 	  Boolean tester = true;
 	  try
 	  {
-		ParseTree tree = parse.program();
+		ParseTree tree = parse.valid();
 	  }
 	  catch (ParseCancellationException e) 
 	  {
