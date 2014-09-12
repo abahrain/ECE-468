@@ -5,20 +5,26 @@ public class Micro
 {
   public static void main(String[] args) throws Exception
   {
-      //ANTLR will read in the file and pass the string to the lexer
+      //ANTLR will read in the file
       ANTLRFileStream stream = new ANTLRFileStream(args[0]);
-      Micro_scan lex = new Micro_scan(stream);
-	  //The lexer piece is then set equal to a token
-      Token t = lex.nextToken();
-      
-	  //Runs until the end of the file
-	  //prints the token type and value to the screen dump
-	  //gets next token in the set
-      while(t.getType() != Micro_scan.EOF)
-      {
-          System.out.println("Token Type: "+Micro_scan.tokenNames[t.getType()]);
-          System.out.println("Value: "+t.getText());
-		  t = lex.nextToken();
+	  //Pass the information to the lexer
+      MicroLexer lex = new MicroLexer(stream);
+	  CommonTokenStream cts = new CommonTokenStream(lex);
+	  //Pass the information to the parser
+	  MicroParser parse = new MicroParser(cts);
+	  parse.setErrorHandler(new BailErrorStrategy());
+	  
+	  //The parser will either accept that the pattern sent in
+	  //is of the correct format for a program. Or, if it is not
+	  //the parser will throw an error that is then caught.
+	  try
+	  {
+		ParseTree tree = parse.program();
+	  }
+	  catch (ParseCancellationException e) 
+	  {
+        System.out.print("Not Accepted");
       }
+	  System.out.print("Accepted");
   }
 }
