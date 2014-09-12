@@ -1,5 +1,5 @@
 LIB_ANTLR := lib/antlr.jar
-ANTLR_SCRIPT := Micro_scan.g4
+ANTLR_SCRIPT := Micro.g4
 
 all: group compiler
 
