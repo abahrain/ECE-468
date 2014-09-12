@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class Micro 
 {
@@ -17,14 +18,20 @@ public class Micro
 	  //The parser will either accept that the pattern sent in
 	  //is of the correct format for a program. Or, if it is not
 	  //the parser will throw an error that is then caught.
+	  Boolean tester = true;
 	  try
 	  {
 		ParseTree tree = parse.program();
 	  }
 	  catch (ParseCancellationException e) 
 	  {
+		tester = false;
         System.out.print("Not Accepted");
       }
-	  System.out.print("Accepted");
+	  
+	  if(tester != false)
+	  {
+		System.out.print("Accepted");
+	  }
   }
 }

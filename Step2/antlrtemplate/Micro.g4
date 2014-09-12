@@ -1,12 +1,12 @@
 grammar Micro;
 
-valid: 'PROGRAM' id 'BEGIN' pgm_body 'END';
+program: 'PROGRAM' id 'BEGIN' pgm_body 'END';
 
 id: IDENTIFIER;
 
 pgm_body: ;
 
-KEYWORD
+/*KEYWORD
 	: 'PROGRAM'
 	| 'BEGIN'
 	| 'STRING'
@@ -22,7 +22,10 @@ KEYWORD
 	| 'READ'
 	| 'WHILE'
 	| 'ENDWHILE'
-	;
+	| 'FLOAT'
+	| 'CONTINUE'
+	| 'BREAK'
+	;*/
 
 IDENTIFIER
 	:[A-z_][A-z0-9_]*
@@ -45,12 +48,6 @@ OPERATOR
 	| '<='
 	| '>='
 	;
-	
-/*STRINGLITERAL
-	: ('"')(~('\n'|'\r'))*('"')
-	//: ('"')(~('\n'|'\r'))*?('"')
-	;
-*/
 
 INTLITERAL
 	: [0-9]+
@@ -58,10 +55,12 @@ INTLITERAL
 
 FLOATLITERAL
 	: [0-9]*['.'][0-9]*
-	// : [0-9]*?['.'][0-9]*  What is the difference between lazy and greedy?
 	;
 	
+STRINGLITERAL
+	: ('"')(~('\n'|'\r'))*('"')
+	;
+
 SPACE: (' ' | '\n' | '\t' | '\r' | '\f')+ -> skip;
-//SPACE: (' '|'\\'.)+ -> skip;
 
 COMMENT: '--'(~('\n'|'\r'))* -> skip;
