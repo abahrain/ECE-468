@@ -26,10 +26,10 @@ public class Micro
 	  catch (ParseCancellationException e) 
 	  {
 		tester = false;
-        System.out.print("Not Accepted");
+        System.out.print("Not accepted");
       }
 	  
-	  if(tester != false)
+	  if(tester)
 	  {
 		System.out.print("Accepted");
 	  }

@@ -6,7 +6,7 @@ id: IDENTIFIER;
 
 pgm_body: ;
 
-/*KEYWORD
+KEYWORD
 	: 'PROGRAM'
 	| 'BEGIN'
 	| 'STRING'
@@ -25,7 +25,7 @@ pgm_body: ;
 	| 'FLOAT'
 	| 'CONTINUE'
 	| 'BREAK'
-	;*/
+	;
 
 IDENTIFIER
 	:[A-z_][A-z0-9_]*
