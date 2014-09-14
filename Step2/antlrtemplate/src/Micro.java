@@ -13,7 +13,8 @@ public class Micro
 	  CommonTokenStream cts = new CommonTokenStream(lex);
 	  //Pass the information to the parser
 	  MicroParser parse = new MicroParser(cts);
-	  parse.setErrorHandler(new BailErrorStrategy());
+	  ANTLRErrorStrategy es = new BailErrorStrategy();
+	  parse.setErrorHandler(es);
 	  
 	  //The parser will either accept that the pattern sent in
 	  //is of the correct format for a program. Or, if it is not
@@ -21,17 +22,17 @@ public class Micro
 	  Boolean tester = true;
 	  try
 	  {
-		ParseTree tree = parse.valid();
+		ParseTree tree = parse.program();
 	  }
 	  catch (ParseCancellationException e) 
 	  {
 		tester = false;
-        System.out.print("Not accepted");
+        System.out.println("Not accepted");
       }
 	  
 	  if(tester)
 	  {
-		System.out.print("Accepted");
+		System.out.println("Accepted");
 	  }
   }
 }

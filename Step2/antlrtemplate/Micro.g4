@@ -1,30 +1,41 @@
 grammar Micro;
 
-valid: 'PROGRAM' id 'BEGIN' pgm_body 'END';
+program: 'PROGRAM' name 'BEGIN' program_body 'END';
 
-id: IDENTIFIER;
+name: IDENTIFIER;
+key: KEYWORD;
+integer: INTLITERAL;
 
-pgm_body: ;
+program_body: (declaration function_declaration)?;
+
+declaration: (string_declaration_list | variable_declaration_list)*;
+
+function_declaration: 'FUNCTION' key name '(' (key name(',')?)* ')' 'BEGIN' function_body 'END';
+
+string_declaration_list: 'STRING' (name(',')?)+ (OPERATOR STRINGLITERAL)?';';
+
+variable_declaration_list: (('INT' (name(',')?)+ (OPERATOR INTLITERAL)?)|('FLOAT' (name(',')?)+ (OPERATOR FLOATLITERAL)?))';';
+
+function_body: (declaration statement ('RETURN' operation?';')?)?;
+
+statement: (if_statement|while_loop|operation)+;
+
+if_statement: 'IF' '(' operation ')' statement else_statement? 'ENDIF';
+
+else_statement: 'ELSE' statement;
+
+while_loop: 'WHILE' '(' operation ')' statement 'ENDWILE';
+
+//for_loop: 'FOR' '(' loop_init loop_test loop_increment ')' ;
+
+operation: name|integer ((OPERATOR name|integer)|(OPERATOR '('name|integer')'))+';'?;
+
 
 KEYWORD
-	: 'PROGRAM'
-	| 'BEGIN'
-	| 'STRING'
-	| 'FUNCTION'
+	: 'STRING'
 	| 'INT'
-	| 'IF'
-	| 'RETURN'
-	| 'ELSE'
-	| 'ENDIF'
-	| 'END'
 	| 'VOID'
-	| 'WRITE'
-	| 'READ'
-	| 'WHILE'
-	| 'ENDWHILE'
 	| 'FLOAT'
-	| 'CONTINUE'
-	| 'BREAK'
 	;
 
 IDENTIFIER
