@@ -638,26 +638,25 @@ public class MicroParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(127);
+			setState(126);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 5) | (1L << 12) | (1L << 13) | (1L << 15) | (1L << 17) | (1L << IDENTIFIER) | (1L << INTLITERAL))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 5) | (1L << 12) | (1L << 13) | (1L << 15) | (1L << 17) | (1L << IDENTIFIER))) != 0)) {
 				{
 				setState(118); declaration();
 				setState(119); statement();
-				setState(125);
+				setState(124);
 				_la = _input.LA(1);
 				if (_la==14) {
 					{
 					setState(120); match(14);
 					setState(122);
 					_la = _input.LA(1);
-					if (_la==IDENTIFIER || _la==INTLITERAL) {
+					if (_la==IDENTIFIER) {
 						{
 						setState(121); operation();
 						}
 					}
 
-					setState(124); match(8);
 					}
 				}
 
@@ -717,37 +716,36 @@ public class MicroParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(132); 
+			setState(131); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
-				setState(132);
+				setState(131);
 				switch (_input.LA(1)) {
 				case 15:
 					{
-					setState(129); if_statement();
+					setState(128); if_statement();
 					}
 					break;
 				case 5:
 					{
-					setState(130); while_loop();
+					setState(129); while_loop();
 					}
 					break;
 				case IDENTIFIER:
-				case INTLITERAL:
 					{
-					setState(131); operation();
+					setState(130); operation();
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
 				}
-				setState(134); 
+				setState(133); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 5) | (1L << 15) | (1L << IDENTIFIER) | (1L << INTLITERAL))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 5) | (1L << 15) | (1L << IDENTIFIER))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -792,20 +790,20 @@ public class MicroParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(136); match(15);
-			setState(137); match(3);
-			setState(138); operation();
-			setState(139); match(1);
-			setState(140); statement();
-			setState(142);
+			setState(135); match(15);
+			setState(136); match(3);
+			setState(137); operation();
+			setState(138); match(1);
+			setState(139); statement();
+			setState(141);
 			_la = _input.LA(1);
 			if (_la==10) {
 				{
-				setState(141); else_statement();
+				setState(140); else_statement();
 				}
 			}
 
-			setState(144); match(11);
+			setState(143); match(11);
 			}
 		}
 		catch (RecognitionException re) {
@@ -843,8 +841,8 @@ public class MicroParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(146); match(10);
-			setState(147); statement();
+			setState(145); match(10);
+			setState(146); statement();
 			}
 		}
 		catch (RecognitionException re) {
@@ -885,12 +883,12 @@ public class MicroParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(149); match(5);
-			setState(150); match(3);
-			setState(151); operation();
-			setState(152); match(1);
-			setState(153); statement();
-			setState(154); match(6);
+			setState(148); match(5);
+			setState(149); match(3);
+			setState(150); operation();
+			setState(151); match(1);
+			setState(152); statement();
+			setState(153); match(6);
 			}
 		}
 		catch (RecognitionException re) {
@@ -905,12 +903,6 @@ public class MicroParser extends Parser {
 	}
 
 	public static class OperationContext extends ParserRuleContext {
-		public IntegerContext integer(int i) {
-			return getRuleContext(IntegerContext.class,i);
-		}
-		public List<IntegerContext> integer() {
-			return getRuleContexts(IntegerContext.class);
-		}
 		public NameContext name(int i) {
 			return getRuleContext(NameContext.class,i);
 		}
@@ -938,94 +930,49 @@ public class MicroParser extends Parser {
 	public final OperationContext operation() throws RecognitionException {
 		OperationContext _localctx = new OperationContext(_ctx, getState());
 		enterRule(_localctx, 28, RULE_operation);
+		int _la;
 		try {
-			int _alt;
-			setState(178);
-			switch (_input.LA(1)) {
-			case IDENTIFIER:
-				enterOuterAlt(_localctx, 1);
+			enterOuterAlt(_localctx, 1);
+			{
+			{
+			setState(155); name();
+			setState(160); 
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			do {
 				{
-				setState(156); name();
-				}
-				break;
-			case INTLITERAL:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(157); integer();
-				setState(171); 
-				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,24,_ctx);
-				do {
-					switch (_alt) {
-					case 1:
-						{
-						setState(171);
-						switch ( getInterpreter().adaptivePredict(_input,23,_ctx) ) {
-						case 1:
-							{
-							setState(161);
-							switch (_input.LA(1)) {
-							case OPERATOR:
-								{
-								setState(158); match(OPERATOR);
-								setState(159); name();
-								}
-								break;
-							case INTLITERAL:
-								{
-								setState(160); integer();
-								}
-								break;
-							default:
-								throw new NoViableAltException(this);
-							}
-							}
-							break;
-
-						case 2:
-							{
-							setState(169);
-							switch (_input.LA(1)) {
-							case OPERATOR:
-								{
-								setState(163); match(OPERATOR);
-								setState(164); match(3);
-								setState(165); name();
-								}
-								break;
-							case INTLITERAL:
-								{
-								setState(166); integer();
-								setState(167); match(1);
-								}
-								break;
-							default:
-								throw new NoViableAltException(this);
-							}
-							}
-							break;
-						}
-						}
-						break;
-					default:
-						throw new NoViableAltException(this);
-					}
-					setState(173); 
-					_errHandler.sync(this);
-					_alt = getInterpreter().adaptivePredict(_input,24,_ctx);
-				} while ( _alt!=2 && _alt!=-1 );
-				setState(176);
-				switch ( getInterpreter().adaptivePredict(_input,25,_ctx) ) {
-				case 1:
+				setState(160);
+				switch (_input.LA(1)) {
+				case OPERATOR:
 					{
-					setState(175); match(8);
+					setState(156); match(OPERATOR);
 					}
 					break;
+				case IDENTIFIER:
+					{
+					setState(157); name();
+					}
+					break;
+				case 3:
+					{
+					setState(158); match(3);
+					}
+					break;
+				case 1:
+					{
+					setState(159); match(1);
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
 				}
 				}
-				break;
-			default:
-				throw new NoViableAltException(this);
+				setState(162); 
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 3) | (1L << IDENTIFIER) | (1L << OPERATOR))) != 0) );
+			}
+			setState(164); match(8);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1040,7 +987,7 @@ public class MicroParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\uacf5\uee8c\u4f5d\u8b0d\u4a45\u78bd\u1b2f\u3378\3\33\u00b7\4\2\t\2"+
+		"\3\uacf5\uee8c\u4f5d\u8b0d\u4a45\u78bd\u1b2f\u3378\3\33\u00a9\4\2\t\2"+
 		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\3\2\3\2\3"+
 		"\2\3\2\3\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\6\5\6\60\n\6\3\7\3\7\7\7\64\n"+
@@ -1048,53 +995,46 @@ public class MicroParser extends Parser {
 		"\16\bE\13\b\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\5\tO\n\t\6\tQ\n\t\r\t\16\t"+
 		"R\3\t\3\t\5\tW\n\t\3\t\3\t\3\n\3\n\3\n\5\n^\n\n\6\n`\n\n\r\n\16\na\3\n"+
 		"\3\n\5\nf\n\n\3\n\3\n\3\n\5\nk\n\n\6\nm\n\n\r\n\16\nn\3\n\3\n\5\ns\n\n"+
-		"\5\nu\n\n\3\n\3\n\3\13\3\13\3\13\3\13\5\13}\n\13\3\13\5\13\u0080\n\13"+
-		"\5\13\u0082\n\13\3\f\3\f\3\f\6\f\u0087\n\f\r\f\16\f\u0088\3\r\3\r\3\r"+
-		"\3\r\3\r\3\r\5\r\u0091\n\r\3\r\3\r\3\16\3\16\3\16\3\17\3\17\3\17\3\17"+
-		"\3\17\3\17\3\17\3\20\3\20\3\20\3\20\3\20\5\20\u00a4\n\20\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\5\20\u00ac\n\20\6\20\u00ae\n\20\r\20\16\20\u00af\3\20"+
-		"\5\20\u00b3\n\20\5\20\u00b5\n\20\3\20\2\21\2\4\6\b\n\f\16\20\22\24\26"+
-		"\30\32\34\36\2\2\u00c3\2 \3\2\2\2\4&\3\2\2\2\6(\3\2\2\2\b*\3\2\2\2\n/"+
-		"\3\2\2\2\f\65\3\2\2\2\168\3\2\2\2\20K\3\2\2\2\22t\3\2\2\2\24\u0081\3\2"+
-		"\2\2\26\u0086\3\2\2\2\30\u008a\3\2\2\2\32\u0094\3\2\2\2\34\u0097\3\2\2"+
-		"\2\36\u00b4\3\2\2\2 !\7\6\2\2!\"\5\4\3\2\"#\7\22\2\2#$\5\n\6\2$%\7\t\2"+
-		"\2%\3\3\2\2\2&\'\7\25\2\2\'\5\3\2\2\2()\7\24\2\2)\7\3\2\2\2*+\7\27\2\2"+
-		"+\t\3\2\2\2,-\5\f\7\2-.\5\16\b\2.\60\3\2\2\2/,\3\2\2\2/\60\3\2\2\2\60"+
-		"\13\3\2\2\2\61\64\5\20\t\2\62\64\5\22\n\2\63\61\3\2\2\2\63\62\3\2\2\2"+
-		"\64\67\3\2\2\2\65\63\3\2\2\2\65\66\3\2\2\2\66\r\3\2\2\2\67\65\3\2\2\2"+
-		"89\7\13\2\29:\5\6\4\2:;\5\4\3\2;C\7\5\2\2<=\5\6\4\2=?\5\4\3\2>@\7\4\2"+
-		"\2?>\3\2\2\2?@\3\2\2\2@B\3\2\2\2A<\3\2\2\2BE\3\2\2\2CA\3\2\2\2CD\3\2\2"+
-		"\2DF\3\2\2\2EC\3\2\2\2FG\7\3\2\2GH\7\22\2\2HI\5\24\13\2IJ\7\t\2\2J\17"+
-		"\3\2\2\2KP\7\17\2\2LN\5\4\3\2MO\7\4\2\2NM\3\2\2\2NO\3\2\2\2OQ\3\2\2\2"+
-		"PL\3\2\2\2QR\3\2\2\2RP\3\2\2\2RS\3\2\2\2SV\3\2\2\2TU\7\26\2\2UW\7\31\2"+
-		"\2VT\3\2\2\2VW\3\2\2\2WX\3\2\2\2XY\7\n\2\2Y\21\3\2\2\2Z_\7\23\2\2[]\5"+
-		"\4\3\2\\^\7\4\2\2]\\\3\2\2\2]^\3\2\2\2^`\3\2\2\2_[\3\2\2\2`a\3\2\2\2a"+
-		"_\3\2\2\2ab\3\2\2\2be\3\2\2\2cd\7\26\2\2df\7\27\2\2ec\3\2\2\2ef\3\2\2"+
-		"\2fu\3\2\2\2gl\7\16\2\2hj\5\4\3\2ik\7\4\2\2ji\3\2\2\2jk\3\2\2\2km\3\2"+
-		"\2\2lh\3\2\2\2mn\3\2\2\2nl\3\2\2\2no\3\2\2\2or\3\2\2\2pq\7\26\2\2qs\7"+
-		"\30\2\2rp\3\2\2\2rs\3\2\2\2su\3\2\2\2tZ\3\2\2\2tg\3\2\2\2uv\3\2\2\2vw"+
-		"\7\n\2\2w\23\3\2\2\2xy\5\f\7\2y\177\5\26\f\2z|\7\20\2\2{}\5\36\20\2|{"+
-		"\3\2\2\2|}\3\2\2\2}~\3\2\2\2~\u0080\7\n\2\2\177z\3\2\2\2\177\u0080\3\2"+
-		"\2\2\u0080\u0082\3\2\2\2\u0081x\3\2\2\2\u0081\u0082\3\2\2\2\u0082\25\3"+
-		"\2\2\2\u0083\u0087\5\30\r\2\u0084\u0087\5\34\17\2\u0085\u0087\5\36\20"+
-		"\2\u0086\u0083\3\2\2\2\u0086\u0084\3\2\2\2\u0086\u0085\3\2\2\2\u0087\u0088"+
-		"\3\2\2\2\u0088\u0086\3\2\2\2\u0088\u0089\3\2\2\2\u0089\27\3\2\2\2\u008a"+
-		"\u008b\7\21\2\2\u008b\u008c\7\5\2\2\u008c\u008d\5\36\20\2\u008d\u008e"+
-		"\7\3\2\2\u008e\u0090\5\26\f\2\u008f\u0091\5\32\16\2\u0090\u008f\3\2\2"+
-		"\2\u0090\u0091\3\2\2\2\u0091\u0092\3\2\2\2\u0092\u0093\7\r\2\2\u0093\31"+
-		"\3\2\2\2\u0094\u0095\7\f\2\2\u0095\u0096\5\26\f\2\u0096\33\3\2\2\2\u0097"+
-		"\u0098\7\7\2\2\u0098\u0099\7\5\2\2\u0099\u009a\5\36\20\2\u009a\u009b\7"+
-		"\3\2\2\u009b\u009c\5\26\f\2\u009c\u009d\7\b\2\2\u009d\35\3\2\2\2\u009e"+
-		"\u00b5\5\4\3\2\u009f\u00ad\5\b\5\2\u00a0\u00a1\7\26\2\2\u00a1\u00a4\5"+
-		"\4\3\2\u00a2\u00a4\5\b\5\2\u00a3\u00a0\3\2\2\2\u00a3\u00a2\3\2\2\2\u00a4"+
-		"\u00ae\3\2\2\2\u00a5\u00a6\7\26\2\2\u00a6\u00a7\7\5\2\2\u00a7\u00ac\5"+
-		"\4\3\2\u00a8\u00a9\5\b\5\2\u00a9\u00aa\7\3\2\2\u00aa\u00ac\3\2\2\2\u00ab"+
-		"\u00a5\3\2\2\2\u00ab\u00a8\3\2\2\2\u00ac\u00ae\3\2\2\2\u00ad\u00a3\3\2"+
-		"\2\2\u00ad\u00ab\3\2\2\2\u00ae\u00af\3\2\2\2\u00af\u00ad\3\2\2\2\u00af"+
-		"\u00b0\3\2\2\2\u00b0\u00b2\3\2\2\2\u00b1\u00b3\7\n\2\2\u00b2\u00b1\3\2"+
-		"\2\2\u00b2\u00b3\3\2\2\2\u00b3\u00b5\3\2\2\2\u00b4\u009e\3\2\2\2\u00b4"+
-		"\u009f\3\2\2\2\u00b5\37\3\2\2\2\35/\63\65?CNRV]aejnrt|\177\u0081\u0086"+
-		"\u0088\u0090\u00a3\u00ab\u00ad\u00af\u00b2\u00b4";
+		"\5\nu\n\n\3\n\3\n\3\13\3\13\3\13\3\13\5\13}\n\13\5\13\177\n\13\5\13\u0081"+
+		"\n\13\3\f\3\f\3\f\6\f\u0086\n\f\r\f\16\f\u0087\3\r\3\r\3\r\3\r\3\r\3\r"+
+		"\5\r\u0090\n\r\3\r\3\r\3\16\3\16\3\16\3\17\3\17\3\17\3\17\3\17\3\17\3"+
+		"\17\3\20\3\20\3\20\3\20\3\20\6\20\u00a3\n\20\r\20\16\20\u00a4\3\20\3\20"+
+		"\3\20\2\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\2\u00b3\2 \3\2\2\2"+
+		"\4&\3\2\2\2\6(\3\2\2\2\b*\3\2\2\2\n/\3\2\2\2\f\65\3\2\2\2\168\3\2\2\2"+
+		"\20K\3\2\2\2\22t\3\2\2\2\24\u0080\3\2\2\2\26\u0085\3\2\2\2\30\u0089\3"+
+		"\2\2\2\32\u0093\3\2\2\2\34\u0096\3\2\2\2\36\u009d\3\2\2\2 !\7\6\2\2!\""+
+		"\5\4\3\2\"#\7\22\2\2#$\5\n\6\2$%\7\t\2\2%\3\3\2\2\2&\'\7\25\2\2\'\5\3"+
+		"\2\2\2()\7\24\2\2)\7\3\2\2\2*+\7\27\2\2+\t\3\2\2\2,-\5\f\7\2-.\5\16\b"+
+		"\2.\60\3\2\2\2/,\3\2\2\2/\60\3\2\2\2\60\13\3\2\2\2\61\64\5\20\t\2\62\64"+
+		"\5\22\n\2\63\61\3\2\2\2\63\62\3\2\2\2\64\67\3\2\2\2\65\63\3\2\2\2\65\66"+
+		"\3\2\2\2\66\r\3\2\2\2\67\65\3\2\2\289\7\13\2\29:\5\6\4\2:;\5\4\3\2;C\7"+
+		"\5\2\2<=\5\6\4\2=?\5\4\3\2>@\7\4\2\2?>\3\2\2\2?@\3\2\2\2@B\3\2\2\2A<\3"+
+		"\2\2\2BE\3\2\2\2CA\3\2\2\2CD\3\2\2\2DF\3\2\2\2EC\3\2\2\2FG\7\3\2\2GH\7"+
+		"\22\2\2HI\5\24\13\2IJ\7\t\2\2J\17\3\2\2\2KP\7\17\2\2LN\5\4\3\2MO\7\4\2"+
+		"\2NM\3\2\2\2NO\3\2\2\2OQ\3\2\2\2PL\3\2\2\2QR\3\2\2\2RP\3\2\2\2RS\3\2\2"+
+		"\2SV\3\2\2\2TU\7\26\2\2UW\7\31\2\2VT\3\2\2\2VW\3\2\2\2WX\3\2\2\2XY\7\n"+
+		"\2\2Y\21\3\2\2\2Z_\7\23\2\2[]\5\4\3\2\\^\7\4\2\2]\\\3\2\2\2]^\3\2\2\2"+
+		"^`\3\2\2\2_[\3\2\2\2`a\3\2\2\2a_\3\2\2\2ab\3\2\2\2be\3\2\2\2cd\7\26\2"+
+		"\2df\7\27\2\2ec\3\2\2\2ef\3\2\2\2fu\3\2\2\2gl\7\16\2\2hj\5\4\3\2ik\7\4"+
+		"\2\2ji\3\2\2\2jk\3\2\2\2km\3\2\2\2lh\3\2\2\2mn\3\2\2\2nl\3\2\2\2no\3\2"+
+		"\2\2or\3\2\2\2pq\7\26\2\2qs\7\30\2\2rp\3\2\2\2rs\3\2\2\2su\3\2\2\2tZ\3"+
+		"\2\2\2tg\3\2\2\2uv\3\2\2\2vw\7\n\2\2w\23\3\2\2\2xy\5\f\7\2y~\5\26\f\2"+
+		"z|\7\20\2\2{}\5\36\20\2|{\3\2\2\2|}\3\2\2\2}\177\3\2\2\2~z\3\2\2\2~\177"+
+		"\3\2\2\2\177\u0081\3\2\2\2\u0080x\3\2\2\2\u0080\u0081\3\2\2\2\u0081\25"+
+		"\3\2\2\2\u0082\u0086\5\30\r\2\u0083\u0086\5\34\17\2\u0084\u0086\5\36\20"+
+		"\2\u0085\u0082\3\2\2\2\u0085\u0083\3\2\2\2\u0085\u0084\3\2\2\2\u0086\u0087"+
+		"\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0088\3\2\2\2\u0088\27\3\2\2\2\u0089"+
+		"\u008a\7\21\2\2\u008a\u008b\7\5\2\2\u008b\u008c\5\36\20\2\u008c\u008d"+
+		"\7\3\2\2\u008d\u008f\5\26\f\2\u008e\u0090\5\32\16\2\u008f\u008e\3\2\2"+
+		"\2\u008f\u0090\3\2\2\2\u0090\u0091\3\2\2\2\u0091\u0092\7\r\2\2\u0092\31"+
+		"\3\2\2\2\u0093\u0094\7\f\2\2\u0094\u0095\5\26\f\2\u0095\33\3\2\2\2\u0096"+
+		"\u0097\7\7\2\2\u0097\u0098\7\5\2\2\u0098\u0099\5\36\20\2\u0099\u009a\7"+
+		"\3\2\2\u009a\u009b\5\26\f\2\u009b\u009c\7\b\2\2\u009c\35\3\2\2\2\u009d"+
+		"\u00a2\5\4\3\2\u009e\u00a3\7\26\2\2\u009f\u00a3\5\4\3\2\u00a0\u00a3\7"+
+		"\5\2\2\u00a1\u00a3\7\3\2\2\u00a2\u009e\3\2\2\2\u00a2\u009f\3\2\2\2\u00a2"+
+		"\u00a0\3\2\2\2\u00a2\u00a1\3\2\2\2\u00a3\u00a4\3\2\2\2\u00a4\u00a2\3\2"+
+		"\2\2\u00a4\u00a5\3\2\2\2\u00a5\u00a6\3\2\2\2\u00a6\u00a7\7\n\2\2\u00a7"+
+		"\37\3\2\2\2\31/\63\65?CNRV]aejnrt|~\u0080\u0085\u0087\u008f\u00a2\u00a4";
 	public static final ATN _ATN =
 		ATNSimulator.deserialize(_serializedATN.toCharArray());
 	static {

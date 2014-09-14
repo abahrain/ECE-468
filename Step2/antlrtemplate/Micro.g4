@@ -16,9 +16,9 @@ string_declaration_list: 'STRING' (name(',')?)+ (OPERATOR STRINGLITERAL)?';';
 
 variable_declaration_list: (('INT' (name(',')?)+ (OPERATOR INTLITERAL)?)|('FLOAT' (name(',')?)+ (OPERATOR FLOATLITERAL)?))';';
 
-function_body: (declaration statement ('RETURN' operation?';')?)?;
+function_body: (declaration statement ('RETURN' operation?)?)?;
 
-statement: (if_statement|while_loop|operation)+;
+statement: (if_statement|while_loop|operation)*;
 
 if_statement: 'IF' '(' operation ')' statement else_statement? 'ENDIF';
 
@@ -26,9 +26,7 @@ else_statement: 'ELSE' statement;
 
 while_loop: 'WHILE' '(' operation ')' statement 'ENDWILE';
 
-//for_loop: 'FOR' '(' loop_init loop_test loop_increment ')' ;
-
-operation: name|integer ((OPERATOR name|integer)|(OPERATOR '('name|integer')'))+';'?;
+operation: (name (OPERATOR|name|'('|')')+)';';
 
 
 KEYWORD
