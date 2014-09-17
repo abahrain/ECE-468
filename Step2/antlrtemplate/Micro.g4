@@ -8,7 +8,7 @@ any_type: variable_type | 'VOID';
 name_list: name name_repeat;
 name_repeat: (',' name name_repeat)*;
 
-program_body: (declaration function)?;
+program_body: declaration function;
 
 declaration: (string_declaration_list | variable_declaration_list)*;
 string_declaration_list: 'STRING' name ':=' STRINGLITERAL';';
@@ -26,31 +26,30 @@ parameter_declaration_repeat: (parameter_declaration parameter_declaration_repea
 statement_list: (statement statement_list)?;
 statement: basic_statement | if_statement | while_statement;
 
-basic_statement: assignment | read | write | return;
+basic_statement: assignment | read | write | re_turn;
 if_statement: 'IF' (condition) declaration statement_list else_portion 'ENDIF';
 else_portion: ('ELSE' declaration statement_list)?;
 while_statement: 'WHILE' (condition) declaration statement_list 'ENDWHILE';
 condition: expression comparison_operator expression;
 comparison_operator: '<'|'>'|'='|'!='|'<='|'>=';
 
-assignment: assignment_frame;
+assignment: assignment_frame';';
 assignment_frame: name ':=' expression;
-read: 'READ' (name_list);
-write: 'WRITE' (name_list);
-return: 'RETURN' expression;
+read: 'READ' (name_list)';';
+write: 'WRITE' (name_list)';';
+re_turn: 'RETURN' expression';';
 
 expression: pre_expression factor;
-pre_expression: (pre_expression factor addition_operation)?;
+pre_expression: pre_expression factor addition_operation | '';
 factor: pre_factor post_expression;
-pre_factor: (pre_factor post_expression multiplication_operation)?;
+pre_factor: pre_factor post_expression multiplication_operation | '';
 post_expression: primary | expression_call;
 expression_call: name (expression_list);
 expression_list: (expression expression_list_repeat)*;
 expression_list_repeat: (',' expression expression_list_repeat)*;
-primary: (expression) | name | INTLITERAL | FLOATLITERAL;
+primary: '('expression')' | name | INTLITERAL | FLOATLITERAL;
 addition_operation: '+'|'-';
 multiplication_operation: '*'|'/';
-
 
 KEYWORD
 	: 'PROGRAM'
