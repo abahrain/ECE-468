@@ -3,37 +3,74 @@ grammar Micro;
 program: 'PROGRAM' name 'BEGIN' program_body 'END';
 
 name: IDENTIFIER;
-key: KEYWORD;
-integer: INTLITERAL;
+variable_type: 'FLOAT'|'INT';
+any_type: variable_type | 'VOID';
+name_list: name name_repeat;
+name_repeat: (',' name name_repeat)*;
 
-program_body: (declaration function_declaration)?;
+program_body: (declaration function)?;
 
 declaration: (string_declaration_list | variable_declaration_list)*;
+string_declaration_list: 'STRING' name ':=' STRINGLITERAL';';
+variable_declaration_list: variable_type name (',' name)* ';';
 
-function_declaration: 'FUNCTION' key name '(' (key name(',')?)* ')' 'BEGIN' function_body 'END';
+function: (function_declaration function)?;
 
-string_declaration_list: 'STRING' (name(',')?)+ (OPERATOR STRINGLITERAL)?';';
+function_declaration: 'FUNCTION' any_type name (parameter_declaration_list) 'BEGIN' function_body 'END';
+function_body: declaration statement_list;
 
-variable_declaration_list: (('INT' (name(',')?)+ (OPERATOR INTLITERAL)?)|('FLOAT' (name(',')?)+ (OPERATOR FLOATLITERAL)?))';';
+parameter_declaration_list: (parameter_declaration parameter_declaration_repeat)?;
+parameter_declaration: variable_type name;
+parameter_declaration_repeat: (parameter_declaration parameter_declaration_repeat)*;
 
-function_body: (declaration statement ('RETURN' operation?)?)?;
+statement_list: (statement statement_list)?;
+statement: basic_statement | if_statement | while_statement;
 
-statement: (if_statement|while_loop|operation)*;
+basic_statement: assignment | read | write | return;
+if_statement: 'IF' (condition) declaration statement_list else_portion 'ENDIF';
+else_portion: ('ELSE' declaration statement_list)?;
+while_statement: 'WHILE' (condition) declaration statement_list 'ENDWHILE';
+condition: expression comparison_operator expression;
+comparison_operator: '<'|'>'|'='|'!='|'<='|'>=';
 
-if_statement: 'IF' '(' operation ')' statement else_statement? 'ENDIF';
+assignment: assignment_frame;
+assignment_frame: name ':=' expression;
+read: 'READ' (name_list);
+write: 'WRITE' (name_list);
+return: 'RETURN' expression;
 
-else_statement: 'ELSE' statement;
-
-while_loop: 'WHILE' '(' operation ')' statement 'ENDWILE';
-
-operation: (name (OPERATOR|name|'('|')')+)';';
+expression: pre_expression factor;
+pre_expression: (pre_expression factor addition_operation)?;
+factor: pre_factor post_expression;
+pre_factor: (pre_factor post_expression multiplication_operation)?;
+post_expression: primary | expression_call;
+expression_call: name (expression_list);
+expression_list: (expression expression_list_repeat)*;
+expression_list_repeat: (',' expression expression_list_repeat)*;
+primary: (expression) | name | INTLITERAL | FLOATLITERAL;
+addition_operation: '+'|'-';
+multiplication_operation: '*'|'/';
 
 
 KEYWORD
-	: 'STRING'
+	: 'PROGRAM'
+	| 'BEGIN'
+	| 'STRING'
+	| 'FUNCTION'
 	| 'INT'
+	| 'IF'
+	| 'RETURN'
+	| 'ELSE'
+	| 'ENDIF'
+	| 'END'
 	| 'VOID'
+	| 'WRITE'
+	| 'READ'
+	| 'WHILE'
+	| 'ENDWHILE'
 	| 'FLOAT'
+	| 'CONTINUE'
+	| 'BREAK'
 	;
 
 IDENTIFIER
