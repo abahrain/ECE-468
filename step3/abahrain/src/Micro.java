@@ -31,7 +31,7 @@ public class Micro
       }
       if(tester)
       {
-		
-	  }
+		parse.tree.printTree();
+      }
   }
 }

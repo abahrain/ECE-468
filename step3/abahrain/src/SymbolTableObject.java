@@ -21,7 +21,6 @@ public class SymbolTableObject
   public void insertSymbol(String type_name, String var_name, String string_value)
   {
     String[] varNameArray = var_name.split(",");
-    System.out.println("INSERTING SHIT BECHES");
     for(int i = 0; i < varNameArray.length; i++)
     {
       System.out.println(type_name + " " + varNameArray[i].trim());
@@ -40,11 +39,16 @@ public class SymbolTableObject
   public void printAllSymbolObjectsInSymbolTable()
   {
     System.out.println("Symbol table " + tableScope);
-    for(int i = 0; i < symbolObjectArrayList.size(); i++)
+    try{
+	for(int i = 0; i < symbolObjectArrayList.size(); i++)
     {
       SymbolObject tempObject = symbolObjectArrayList.get(i);
       tempObject.printFormattedSymbolOutput();
     }
     System.out.println();
+	}catch (NullPointerException e)
+	{
+		//System.out.println();
+	}
   }
 }

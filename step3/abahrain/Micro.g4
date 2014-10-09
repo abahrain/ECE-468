@@ -1,40 +1,31 @@
 grammar Micro;
 
-@member {
-	protected void mismatch(IntStream input, int type, BitSet follow)
-	  throws RecognitionException
-	{
-	  throw new MismatchedTokenException(type, input);
-	}
-}
-@rulecatch {
-	catch (RecognitionException e) {
-		throw e;
-	}
+@members
+{
+	public MakeSymbolTable tree = new MakeSymbolTable();
 }
 
-program: 'PROGRAM' name 'BEGIN' program_body 'END' {SymbolTableClass.popSymbolTableOffTheStack();};
+program: 'PROGRAM' name 'BEGIN' program_body 'END';
 
-name: IDENTIFIER;
-string: STRINGLITERAL;
-program_body: {SymbolTableClass.createGlobalScopeTable(); } declaration {SymbolTableClass.printSymbolTable();} function;
+name returns [String identifier]: IDENTIFIER {$identifier = (String)$IDENTIFIER.text;};
+program_body: declaration function;
 declaration: (string_declaration_list | variable_declaration_list)*;
 
-string_declaration_list: 'STRING' name ':=' string';' {SymbolTableClass.insertSymbolIntoTable("STRING", $name.text, $string.text);};
-
-variable_declaration_list: variable_type name_list';' {SymbolTableClass.insertSymbolIntoTable($variable_type.text, $name_list.text, null);};
+string_declaration_list: 'STRING' name ':=' string';'{tree.insertString($name.text,$string.text);};
+string: STRINGLITERAL;
+variable_declaration_list: variable_type name_list';'{tree.addListOfVariables($name_list.names,$variable_type.text);};
 variable_type: 'FLOAT'|'INT';
 any_type: variable_type | 'VOID';
-name_list: name name_repeat;
-name_repeat: (',' name name_repeat)*;
+name_list returns [ArrayList<String> names]: name name_repeat {$names = $name_repeat.names_list; $names.add(0,$name.text);};
+name_repeat returns [ArrayList<String> names_list]: ',' name named_list = name_repeat{$names_list = $named_list.names_list; $names_list.add(0,$name.text);}|{$names_list = new ArrayList<String>();};
 
 parameter_declaration_list: (parameter_declaration parameter_declaration_repeat)?;
-parameter_declaration: variable_type name {SymbolTableClass.insertSymbolIntoTable($variable_type.text, $name.text, null);};
+parameter_declaration: variable_type name {tree.addSingleVariable($name.text,$variable_type.text);};
 parameter_declaration_repeat: (',' parameter_declaration parameter_declaration_repeat)*;
 
 function: (function_declaration function)?;
-function_declaration: 'FUNCTION' any_type name {SymbolTableClass.createFunctionScopeTable($name.text);} '('parameter_declaration_list')' 'BEGIN' function_body 'END' {SymbolTableClass.popSymbolTableOffTheStack();};
-function_body: declaration {SymbolTableClass.printSymbolTable();} statement_list;
+function_declaration: 'FUNCTION' any_type name {tree.openScope($name.text);} '('parameter_declaration_list')' 'BEGIN' function_body 'END'{tree.closeScope();};
+function_body: declaration statement_list;
 
 statement_list: (statement statement_list)?;
 statement: basic_statement | if_statement | while_statement;
@@ -58,9 +49,9 @@ primary: '('expression')' | name | INTLITERAL | FLOATLITERAL;
 addition_operation: '+'|'-';
 multiplication_operation: '*'|'/';
 
-if_statement: {SymbolTableClass.createBlockScopeTable();} 'IF' '('condition')' declaration statement_list {SymbolTableClass.printSymbolTable();} {SymbolTableClass.popSymbolTableOffTheStack();} else_portion 'ENDIF';
-else_portion: ( {SymbolTableClass.createBlockScopeTable();} 'ELSE' declaration {SymbolTableClass.printSymbolTable();} {SymbolTableClass.popSymbolTableOffTheStack();} statement_list)?;
-while_statement: 'WHILE' '('condition')' declaration statement_list 'ENDWHILE';
+if_statement: 'IF' {tree.openScope();} '('condition')' declaration statement_list {tree.closeScope();} else_portion 'ENDIF';
+else_portion: ( 'ELSE' {tree.openScope();} declaration statement_list {tree.closeScope();})?;
+while_statement: 'WHILE' {tree.openScope();} '('condition')' declaration statement_list 'ENDWHILE' {tree.closeScope();};
 condition: expression comparison_operator expression;
 comparison_operator: '<'|'>'|'='|'!='|'<='|'>=';
 

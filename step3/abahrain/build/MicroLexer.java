@@ -42,6 +42,9 @@ public class MicroLexer extends Lexer {
 	};
 
 
+		public MakeSymbolTable tree = new MakeSymbolTable();
+
+
 	public MicroLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);

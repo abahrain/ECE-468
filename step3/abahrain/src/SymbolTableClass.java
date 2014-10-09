@@ -1,46 +1,105 @@
-import java.util.Stack;
+import java.util.*;
 
 public class SymbolTableClass
 {
-  private static Stack<SymbolTableObject> symbolTableStack = new Stack<SymbolTableObject>();
-  private static int blockScopeCount = 1;
-  public static void createGlobalScopeTable()
+  class SymbolTableClass
   {
-    System.out.println("Creating symbolTableObject : Scope => GLOBAL");
-    symbolTableStack.push(new SymbolTableObject("GLOBAL"));
-  }
-
-  public static void createFunctionScopeTable(String functionName) 
-  {
-    System.out.println("Creating symbolTableObject : Scope => " + functionName);
-    symbolTableStack.push(new SymbolTableObject(functionName));
+    String topName;
+    SymbolTableClass top;
+    ArrayList<SymbolTableClass> bottom;
+    LinkedHashMap<String,Name> table;
+    
+    public SymbolTableClass(String topName)
+    {
+      this.topName = topName;
+      top = null;
+      bottom = new ArrayList<SymbolTableClass>();
+      table = new LinkedHashMap<String, Name>();
+    }
+    
+    public void showTable()
+    {
+      System.out.println("Symbol table " + topName);
+      Set<String> keys = table.keySet();
+      for(String key : keys)
+      {
+	System.out.println(table.get(key));
+      }
+    }
   }
   
-  public static void createBlockScopeTable()
+  SymbolTableClass global;
+  SymbolTableClass current;
+  int counter = 1;
+  
+  public SymbolTableClass()
   {
-    System.out.println("Creating symbolTableObject : Scope => BLOCK " + Integer.toString(blockScopeCount));
-    symbolTableStack.push(new SymbolTableObject("BLOCK " + Integer.toString(blockScopeCount++)));
+    global = new SymbolTableClass("GLOBAL");
+    current = global;
   }
-
-  public static void insertSymbolIntoTable(String type_name, String var_name, String string_value)
+  
+  public void startScope(String topName)
   {
-    SymbolTableObject tempSymbolTableObject = symbolTableStack.pop();
-    tempSymbolTableObject.insertSymbol(type_name, var_name, string_value);
-    tempSymbolTableObject.printAllSymbolObjectsInSymbolTable();
-    symbolTableStack.push(tempSymbolTableObject);
+	SymbolTableClass start = new SymbolTableClass;
+	start.top = current;
+	start.top.bottom.add(start);
   }
-
-  public static void printSymbolTable()
+  
+  public void endScope()
   {
-    SymbolTableObject tempSymbolTableObject = symbolTableStack.pop();
-    tempSymbolTableObject.printAllSymbolObjectsInSymbolTable();
-    symbolTableStack.push(tempSymbolTableObject);
+	current = current.top;
   }
-
-  public static void popSymbolTableOffTheStack()
+  
+  public void addallVar(ArrayList<String> names, String type)
   {
-    SymbolTableObject tempSymbolObject = symbolTableStack.pop();
-    tempSymbolObject.printAllSymbolObjectsInSymbolTable();
+	for(String name : names)
+	{
+		addallVar(name, type);
+	}
   }
-}
-
+  
+  public void addsomeVar(String name, String type)
+  {
+	checkForShadowInParents(current.top, name);
+	
+	if(current.table.containsKey(name))
+	{
+		System.out.println("DECLARATION ERROR "+name);
+		System.exit(0);
+	}
+	
+	current.table.put(name, new Name(name,type));
+  }
+  
+  private void checkForShadowInParents9SymbolTableClass node, String variable)
+  {
+	if(node == null)
+	{
+		return;
+	}
+	if(node.table.containsKey(variable))
+	{
+		System.out.println("SHADOW WARNING "+variable);
+	}
+	checkForShadowsInParents(node.top, var);
+  }
+  
+  public void insertString(String name, String value)
+  {
+	current.table.put(name, new Name(name,"STRING",value);
+  }
+  
+  public void printTree()
+  {
+	printTreeHelper(global);
+  }
+  
+  private void printTreeHelper(SymbolTableClass state)
+  {
+	state.printTable();
+	System.out.println();
+	for(SymbolTableClass layer : state.bottom)
+	{
+		printTreeHelper(layer);
+	}
+  }
