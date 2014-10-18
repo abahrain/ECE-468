@@ -19,13 +19,13 @@ public class Micro
 		parse.setErrorHandler(es);
 		ParseTree tree = parse.program();
 		ParseTreeWalker walking = new ParseTreeWalker();
-		MyListener listen = new MyListener(parse);
+		MyListener listen = new MyListener(parse.tree);
 		walking.walk(listen, tree);
-		MyVisitor visiting = new MyVisitor(listen.stack,listen.function);
+		/* MyVisitor visiting = new MyVisitor(listen.stack,listen.function);
 		visiting.visit(tree);
 		ConvertIR convert = new ConvertIR(visiting.output,visiting.table);
-		System.out.println(convert);
-		//System.out.println("BOOM!");
+		System.out.println(convert); */
+		System.out.println("BOOM!");
 	}
 	catch (ParseCancellationException e) 
 	{
