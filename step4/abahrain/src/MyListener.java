@@ -8,7 +8,7 @@ public class MyListener extends MicroBaseListener
 	class Scope
 	{
 		String title = null;
-		LinkedHashMap<String, String> information = new LinkedHashMap();
+		LinkedHashMap<String, String> information = new LinkedHashMap<String,String>();
     
 		public Scope()
 		{
@@ -40,7 +40,7 @@ public class MyListener extends MicroBaseListener
 		}
 	}
   
-	ParseTreeProperty<Scope> scopes;
+	ParseTreeProperty<Scope> scopes = new ParseTreeProperty<>();
     MakeSymbolTable symbolTable;
 	int register_count;
 	int label_count;
@@ -160,27 +160,28 @@ public class MyListener extends MicroBaseListener
    
    public void createNode(ParserRuleContext ctx, String index, String value)
    {
-    scopes.get(ctx).information.put(index,value);
+		scopes.get(ctx).information.put(index,value);
    }
    
    public void returnChild(ParserRuleContext ctx, String string)
    {
-    ParserRuleContext parent = ctx.getParent();
-    if(parent != null)
-    {
-     Scope parentScope = scopes.get(ctx.getParent());
-     if(string != null)
-     {
-      parentScope.title = parentScope.title + " " + string;
-     }
-    }
+		ParserRuleContext parent = ctx.getParent();
+		if(parent != null)
+		{
+			Scope parentScope = scopes.get(ctx.getParent());
+			if(string != null)
+			{
+				parentScope.title = parentScope.title + " " + string;
+			}
+		}
    }
 	//come on... do stuff	
 	@Override
 	public void exitExpression(MicroParser.ExpressionContext ctx) 
 	{ 
 		Scope node_properties = scopes.get(ctx);
-		if(scopes.get(ctx).information.containsKey("register"))
+		
+		if(node_properties.information.containsKey("register"))
 		{
 			createNode(ctx,"register",scopes.get(ctx).information.get("register"));
 		}
@@ -242,12 +243,19 @@ public class MyListener extends MicroBaseListener
 		createNode(ctx,"addition_operation",ctx.getText());
 	}
 	@Override
+	public void exitMultiplication_operation(MicroParser.Multiplication_operationContext ctx)
+	{
+		createNode(ctx,"multiplication_operation",ctx.getText());
+		System.out.println("multop: "+ctx.getText());
+	}
+	@Override
 	public void exitPrimary(MicroParser.PrimaryContext ctx) 
 	{ 
 		createNode(ctx,"primary",ctx.getText());
+		//System.out.println("primary: "+ctx.getText());
 	}
 	@Override
-	public void enterName(MicroParser.NameContext ctx) 
+	public void exitName(MicroParser.NameContext ctx) 
 	{ 
 		Scope parentScope = scopes.get(ctx.getParent());
 		if(parentScope.information.containsKey("Left_value"))
@@ -268,18 +276,19 @@ public class MyListener extends MicroBaseListener
 	@Override
 	public void exitCondition(MicroParser.ConditionContext ctx) 
 	{ 
-		System.out.println(whichOperation(scopes.get(ctx.getChild(1)).information.get("compop")) + " " + scopes.get(ctx.getChild(0)).information.get("register") + " " + scopes.get(ctx.getChild(2)).information.get("register") + " " + generateLabel());
+		System.out.println(whichOperation(scopes.get(ctx.getChild(1)).information.get("comparison_operator")) + " " + scopes.get(ctx.getChild(0)).information.get("register") + " " + scopes.get(ctx.getChild(2)).information.get("register") + " " + generateLabel());
 	}
 	@Override
 	public void exitFactor(MicroParser.FactorContext ctx) 
 	{ 
 		Scope expression = scopes.get(ctx.getParent().getChild(0));
+		System.out.println("E: "+expression.toString());
 		if(!expression.toString().isEmpty())
 		{
 			String type = symbolTable.lookup(scopes.get(ctx).information.get("primary")).type;
 			String temp = getNewRegister(type);
 			String operation = whichOperator(expression.information.get("addition_operation"), type);
-     
+			
 			System.out.println(operation + " " + expression.information.get("primary") + " " + scopes.get(ctx).information.get("primary") + " " + temp);
 			createNode(ctx,"primary", temp);
 		}
@@ -288,6 +297,7 @@ public class MyListener extends MicroBaseListener
 	public void exitPre_expression(MicroParser.Pre_expressionContext ctx) 
 	{ 
 		Scope parent = scopes.get(ctx.getParent());
+		//System.out.println("Pre-e: "+ctx.getText());
 	}
 	@Override 
 	public void exitEveryRule(ParserRuleContext ctx)
@@ -295,8 +305,16 @@ public class MyListener extends MicroBaseListener
 		ParserRuleContext parent = ctx.getParent();
 		if(parent != null)
 		{
-			Scope parentNode = scopes.get(ctx.getParent());
-			parentNode.information.putAll(scopes.get(ctx).information);
+			Scope parentScope = scopes.get(ctx.getParent());
+			parentScope.information.putAll(scopes.get(ctx).information);
+		}
+	}
+	@Override
+	public void enterEveryRule(ParserRuleContext ctx)
+	{
+		if(ctx.getText() != null)
+		{
+			scopes.put(ctx, new Scope(ctx.getText()));
 		}
 	}
 	/* @Override
