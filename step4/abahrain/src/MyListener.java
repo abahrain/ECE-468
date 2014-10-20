@@ -1,11 +1,14 @@
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.*;
+
 import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class MyListener extends MicroBaseListener
 {
-	class Scope
+	
+	/*class Scope
 	{
 		String title = null;
 		LinkedHashMap<String, String> information = new LinkedHashMap<String,String>();
@@ -209,8 +212,13 @@ public class MyListener extends MicroBaseListener
 		{
 			store_Operation = "STOREF";
 		}
-    
-		System.out.println(store_Operation + " " + scopes.get(ctx).information.get("register") + " " + left);
+		register_count++;
+		//System.out.println(ctx.expression().pre_expression().getText());
+		if(ctx.expression().pre_expression().getText().isEmpty())
+		{
+			System.out.println(store_Operation + " " + scopes.get(ctx).information.get("register") + " $T"+register_count);
+		}
+		System.out.println(store_Operation + " $T"+register_count + " " + left);
 	}
 	@Override
 	public void exitComparison_operator(MicroParser.Comparison_operatorContext ctx) 
@@ -240,13 +248,12 @@ public class MyListener extends MicroBaseListener
 	@Override
 	public void exitAddition_operation(MicroParser.Addition_operationContext ctx) 
 	{ 
-		createNode(ctx,"addition_operation",ctx.getText());
+		createNode(ctx,"operation",ctx.getText());
 	}
 	@Override
 	public void exitMultiplication_operation(MicroParser.Multiplication_operationContext ctx)
 	{
-		createNode(ctx,"multiplication_operation",ctx.getText());
-		System.out.println("multop: "+ctx.getText());
+		createNode(ctx,"operation",ctx.getText());
 	}
 	@Override
 	public void exitPrimary(MicroParser.PrimaryContext ctx) 
@@ -280,24 +287,130 @@ public class MyListener extends MicroBaseListener
 	}
 	@Override
 	public void exitFactor(MicroParser.FactorContext ctx) 
-	{ 
-		Scope expression = scopes.get(ctx.getParent().getChild(0));
-		System.out.println("E: "+expression.toString());
-		if(!expression.toString().isEmpty())
+	{
+		if(!ctx.pre_factor().getText().isEmpty())
 		{
-			String type = symbolTable.lookup(scopes.get(ctx).information.get("primary")).type;
-			String temp = getNewRegister(type);
-			String operation = whichOperator(expression.information.get("addition_operation"), type);
-			
-			System.out.println(operation + " " + expression.information.get("primary") + " " + scopes.get(ctx).information.get("primary") + " " + temp);
-			createNode(ctx,"primary", temp);
+			String left = ctx.pre_factor().post_expression().getText();
+			String right = ctx.post_expression().getText();
+			String mult_Operation = "ERROR";
+			String left_Type = symbolTable.lookup(left).type;
+			String right_Type = symbolTable.lookup(right).type;
+			if (left_Type.equals("INT") && right_Type.equals("INT"))
+			{
+				mult_Operation = "MULTI";
+			}
+			else if(left_Type.equals("FLOAT") || right_Type.equals("FLOAT"))
+			{
+				mult_Operation = "MULTF";
+			}
+			MicroParser.Pre_factorContext pre_factor = ctx.pre_factor();
+			while(!pre_factor.getText().isEmpty())
+			{
+				register_count++;
+				System.out.println(mult_Operation+" "+left+" "+right+" $T"+register_count);
+				pre_factor = pre_factor.pre_factor();
+			}
 		}
 	}
 	@Override
 	public void exitPre_expression(MicroParser.Pre_expressionContext ctx) 
 	{ 
-		Scope parent = scopes.get(ctx.getParent());
+		//Scope parent = scopes.get(ctx.getParent());
 		//System.out.println("Pre-e: "+ctx.getText());
+		Scope expression = scopes.get(ctx.getParent().getChild(0));
+		//System.out.println(expression.toString());
+		String operate = "operation";
+		if(!expression.toString().isEmpty())
+		{
+			String type = symbolTable.lookup(scopes.get(ctx).information.get("primary")).type;
+			String temp = getNewRegister(type);
+			String operation = whichOperator(expression.information.get(operate), type);
+			
+			System.out.println(operation + " " + expression.information.get("primary") + " " + scopes.get(ctx).information.get("primary") + " " + temp);
+			createNode(ctx,"primary", temp);
+		}
+	}
+	@Override 
+	public void exitRe_turn(MicroParser.Re_turnContext ctx) 
+	{ 
+		System.out.println("RET: "+ctx.getText());
+		createNode(ctx,"return",ctx.getText());
+	}
+	@Override 
+	public void exitWrite(MicroParser.WriteContext ctx)
+	{
+		String current_name = ctx.name_list().name().getText();
+		String write_Operation = "ERROR";
+		String current_name_Type = symbolTable.lookup(current_name).type;
+		if (current_name_Type.equals("INT"))
+		{
+			write_Operation = "WRITEI";
+		}
+		else if(current_name_Type.equals("FLOAT"))
+		{
+			write_Operation = "WRITEF";
+		}
+		else if(current_name_Type.equals("STRING"))
+		{
+			write_Operation = "WRITES";
+		}
+		System.out.println(write_Operation+" "+ctx.name_list().name().getText());
+		MicroParser.Name_repeatContext name_repeat = ctx.name_list().name_repeat();
+		while(name_repeat.name() != null)
+		{
+			current_name = name_repeat.name().getText();
+			write_Operation = "ERROR";
+			current_name_Type = symbolTable.lookup(current_name).type;
+			if (current_name_Type.equals("INT"))
+			{
+				write_Operation = "WRITEI";
+			}
+			else if(current_name_Type.equals("FLOAT"))
+			{
+				write_Operation = "WRITEF";
+			}
+			else if(current_name_Type.equals("STRING"))
+			{
+				write_Operation = "WRITES";
+			}
+			System.out.println(write_Operation+" "+name_repeat.name().getText());
+			name_repeat = name_repeat.name_repeat();
+		}
+	}
+	@Override
+	public void exitRead(MicroParser.ReadContext ctx)
+	{
+		String current_name = ctx.name_list().name().getText();
+		String read_operation = "ERROR";
+		String current_name_Type = symbolTable.lookup(current_name).type;
+		if (current_name_Type.equals("INT"))
+		{
+			read_operation = "READI";
+		}
+		else if(current_name_Type.equals("FLOAT"))
+		{
+			read_operation = "READF";
+		}
+		System.out.println(read_operation+" "+ctx.name_list().name().getText());
+		MicroParser.Name_repeatContext name_repeat = ctx.name_list().name_repeat();
+		while(name_repeat.name() != null)
+		{
+			current_name = ctx.name_list().name().getText();
+			read_operation = "ERROR";
+			current_name_Type = symbolTable.lookup(current_name).type;
+			if (current_name_Type.equals("INT"))
+			{
+				read_operation = "READI";
+			}
+			else if(current_name_Type.equals("FLOAT"))
+			{
+				read_operation = "READF";
+			}
+			System.out.println(read_operation+" "+name_repeat.name().getText());
+			name_repeat = name_repeat.name_repeat();
+		}
+		//createNode(ctx,"read",ctx.name_list().getText());
+		//System.out.println(scopes.get(ctx).information.get("read"));
 	}
 	@Override 
 	public void exitEveryRule(ParserRuleContext ctx)
@@ -316,86 +429,5 @@ public class MyListener extends MicroBaseListener
 		{
 			scopes.put(ctx, new Scope(ctx.getText()));
 		}
-	}
-	/* @Override
-	public void exitAssignment_frame(MicroParser.Assignment_frameContext ctx)
-	{ 
-		System.out.println("STOREI "+ctx.expression().getText()+" $T"+register_count);
-		System.out.println("STOREI $T"+register_count+" "+ctx.name().getText());
-		register_count += 1;
-	}	
-	@Override
-	public void exitIf_statement(MicroParser.If_statementContext ctx)
-	{ 
-		System.out.println("BLOCK " + Integer.toString(register_count));
-		register_count += 1;
-	}	
-	@Override
-	public void enterWhile_statement(MicroParser.While_statementContext ctx)
-	{ 
-		System.out.println("BLOCK " + Integer.toString(register_count));
-		register_count += 1;
-	}	
-	@Override
-	public void exitVariable_declaration_list(MicroParser.Variable_declaration_listContext ctx)
-	{ 
-		String temp = ctx.name_list().getText();
-		String[] array = temp.split(",");
-		if (ctx.variable_type().getText().equals("INT"))
-		{
-			for (String var : array)
-			{
-				System.out.println(var + " INT");
-			}
-		}
-		else
-		{
-			for (String var : array)
-			{
-				System.out.println(var + " FLOAT");
-			}
-		}
-	}	
-	@Override
-	public void enterParameter_declaration(MicroParser.Parameter_declarationContext ctx)
-	{ 
-		if (ctx.variable_type().getText().equals("INT"))
-		{
-			System.out.println(ctx.name().getText() + " INT");
-		}
-		else
-		{
-			System.out.println(ctx.name().getText() + " FLOAT");
-		}
-	}
-	@Override
-	public void enterFunction_declaration(MicroParser.Function_declarationContext ctx)
-	{ 
-		System.out.println(ctx.name().getText());
-		if (ctx.any_type().getText().equalsIgnoreCase("INT"))
-		{
-			System.out.println(ctx.name().getText() + " INT");
-		}
-		else if(ctx.any_type().getText().equalsIgnoreCase("FLOAT"))
-		{
-			System.out.println(ctx.name().getText() + " FLOAT");
-		}
-		else
-		{
-		}
-	}		
-	@Override
-	public void enterString_declaration_list(MicroParser.String_declaration_listContext ctx)
-	{ 
-		System.out.println(ctx.string().getText()+" "+ctx.name().getText() + " INT");
-	}	
-	@Override
-	public void enterElse_portion(MicroParser.Else_portionContext ctx)
-	{ 
-		if (!ctx.getText().equals(""))
-		{
-			System.out.println("BLOCK " + Integer.toString(register_count));
-			register_count += 1;
-		}
-	} */
+	}*/
 }

@@ -1,10 +1,10 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import java.util.Arrays;
+/*import java.util.Arrays;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import org.antlr.v4.runtime.tree.gui.TreeViewer;
+import org.antlr.v4.runtime.tree.gui.TreeViewer;*/
 
 public class Micro 
 {
@@ -25,23 +25,23 @@ public class Micro
 		ParseTreeWalker walking = new ParseTreeWalker();
 		MyListener listen = new MyListener(parse.tree);
 		walking.walk(listen, tree);
-		System.out.println(tree.toStringTree(parse));
+		//System.out.println(tree.toStringTree(parse));
 		
 		/* MyVisitor visiting = new MyVisitor(listen.stack,listen.function);
 		visiting.visit(tree);
 		ConvertIR convert = new ConvertIR(visiting.output,visiting.table);
 		System.out.println(convert); */
 		//System.out.println("BOOM!");
-		JFrame frame = new JFrame("Antlr AST");
+		/*JFrame frame = new JFrame("Antlr AST");
         JPanel panel = new JPanel();
         TreeViewer viewr = new TreeViewer(Arrays.asList(
                 parse.getRuleNames()),tree);
-        viewr.setScale(1);//scale a little
+        viewr.setScale(.73);//scale a little
         panel.add(viewr);
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(200,200);
-        frame.setVisible(true);
+        frame.setVisible(true);*/
 	}
 	catch (ParseCancellationException e) 
 	{
