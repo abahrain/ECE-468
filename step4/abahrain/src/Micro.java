@@ -23,14 +23,13 @@ public class Micro
 		parse.setErrorHandler(es);
 		ParseTree tree = parse.program();
 		ParseTreeWalker walking = new ParseTreeWalker();
-		MyListener listen = new MyListener(parse.tree);
+		MyListener listen = new MyListener(parse);
 		walking.walk(listen, tree);
 		//System.out.println(tree.toStringTree(parse));
-		
-		/* MyVisitor visiting = new MyVisitor(listen.stack,listen.function);
-		visiting.visit(tree);
-		ConvertIR convert = new ConvertIR(visiting.output,visiting.table);
-		System.out.println(convert); */
+		MyVisitor visited = new MyVisitor(listen.table, listen.functionMap);
+		visited.visit(tree);
+		IRToTiny translate = new IRToTiny(visited.output, listen.table);
+		System.out.println(translate);
 		//System.out.println("BOOM!");
 		/*JFrame frame = new JFrame("Antlr AST");
         JPanel panel = new JPanel();

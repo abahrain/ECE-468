@@ -52,26 +52,6 @@ public class MakeSymbolTable
 			this.type = type;
 			this.value = value;
 		}
-
-		private int sizeof(String type)
-		{
-			if (type.equals("INT")) 
-			{
-				return 8;
-			}
-			else if (type.equals("FLOAT")) 
-			{
-				return 32;
-			}
-			else if (type.equals("STRING"))
-			{
-				return 8;
-			}
-			else 
-			{
-				return -1;
-			}
-		}
 		
 		public boolean isString() 
 		{
