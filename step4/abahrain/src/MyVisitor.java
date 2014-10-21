@@ -1,10 +1,8 @@
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.*;
 
 public class MyVisitor extends MicroBaseVisitor<Node>
 {
@@ -196,27 +194,31 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			  
 			  public Node visitExpression_list(MicroParser.Expression_listContext ctx)
 			  {
-			    Node exprNode = (Node)visit(ctx.expression());
+			  	ParseTree temp = (ParseTree)ctx.expression();
+			    Node exprNode = (Node)visit(temp);
 			    
 
 			    this.Stack_of_Functions.push(exprNode.content);
 			    this.countPUSH += 1;
-			    if (!"".equals(ctx.expression_list_repeat().getText())) 
+			    temp = (ParseTree)ctx.expression_list_repeat();
+			    if (!"".equals(temp.getText())) 
 			    {
-			      visit(ctx.expression_list_repeat());
+			      	visit(temp);
 			    }
 			    return null;
 			  }
 			  
 			  public Node visitExpression_list_repeat(MicroParser.Expression_list_repeatContext ctx)
 			  {
-			    Node exprNode = (Node)visit(ctx.expression());
+			  	ParseTree temp = (ParseTree)ctx.expression();
+			    Node exprNode = (Node)visit(temp);
 			    
 			    this.Stack_of_Functions.push(exprNode.content);
 			    this.countPUSH += 1;
-			    if (!"".equals(ctx.expression_list_repeat().getText())) 
+			    temp = (ParseTree)ctx.expression_list_repeat();
+			    if (!"".equals(temp.getText())) 
 			    {
-			      visit(ctx.expression_list_repeat());
+			      	visit(temp);
 			    }
 			    return null;
 			  }
@@ -241,7 +243,7 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			  
 			  public Node visitParameter_declaration(MicroParser.Parameter_declarationContext ctx)
 			  {
-			    Node newNode;
+			    Node newNode = null;
 			    if (ctx.variable_type().getText().equalsIgnoreCase("INT")) 
 			    {
 			      newNode = new Node(ctx.name().getText(), 1);
@@ -250,7 +252,7 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    {
 			      newNode = new Node(ctx.name().getText(), 2);
 			    }
-			    return null;
+			    return newNode;
 			  }
 			  
 			  public Node visitExpression(MicroParser.ExpressionContext ctx)
@@ -444,115 +446,82 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			  
 			  public String resolveDoComp(String input)
 			  {
-			    if (input.contains("GEI"))
-			    {
-			      return input.replace("GEI", "LTI");
-			    }
-			    if (input.contains("LEI"))
-			    {
-			      return input.replace("LEI", "GTI");
-			    }
-			    if (input.contains("NEI"))
-			    {
-			      return input.replace("NEI", "EQI");
-			    }
-			    if (input.contains("EQI")) 
-			    {
-			      return input.replace("EQI", "NEI");
-			    }
-			    if (input.contains("GTI"))
-			    {
-			      return input.replace("GTI", "LEI");
-			    }
-			    if (input.contains("LTI"))
-			    {
-			      return input.replace("LTI", "GEI");
-			    }
-			    if (input.contains("GEF")) 
-			    {
-			      return input.replace("GEF", "LTF");
-			    }
-			    if (input.contains("LEF")) 
-			    {
-			      return input.replace("LEF", "GTF");
-			    }
-			    if (input.contains("NEF"))
-			    {
-			      return input.replace("NEF", "EQF");
-			    }
-			    if (input.contains("EQF"))
-			    {
-			      return input.replace("EQF", "NEF");
-			    }
-			    if (input.contains("GTF")) 
-			    {
-			      return input.replace("GTF", "LEF");
-			    }
-			    if (input.contains("LTF"))
-			    {
-			      return input.replace("LTF", "GEF");
-			    }
-			    System.out.println("ERROR");
-			    return null;
+				  switch(input)
+				  {
+				  case("GEI"):
+					  return input.replace("GEI", "LTI");
+				  case("LEI"):
+					  return input.replace("LEI", "GTI");
+				  case("NEI"):
+				      return input.replace("NEI", "EQI");
+				  case("EQI"): 
+				      return input.replace("EQI", "NEI");
+				  case("GTI"):
+					  return input.replace("GTI", "LEI");
+				  case("LTI"):
+				  	  return input.replace("LTI", "GEI");
+				  case("GEF"):
+					  return input.replace("GEF", "LTF");
+				  case("LEF"):
+					  return input.replace("LEF", "GTF");
+				  case("NEF"):
+					  return input.replace("NEF", "EQF");
+				  case("EQF"):
+					  return input.replace("EQF", "NEF");
+				  case("GTF"):
+					  return input.replace("GTF", "LEF");
+				  case("LTF"):
+					  return input.replace("LTF", "GEF");
+				  default:
+					  System.out.println("ERROR");
+					  return null;
+				  }
 			  }
 			  
 			  public Node resolveComp(Node op1, Node op2, String op)
 			  {
 			    if ((op1.type == 1) && (op2.type == 1))
 			    {
-			      if (op.equalsIgnoreCase("<"))
-			      {
-			        return new Node("GEI " + op1.content + " " + op2.content, 4);
-			      }
-			      if (op.equalsIgnoreCase(">")) 
-			      {
-			        return new Node("LEI " + op1.content + " " + op2.content, 4);
-			      }
-			      if (op.equalsIgnoreCase("=")) 
-			      {
-			        return new Node("NEI " + op1.content + " " + op2.content, 4);
-			      }
-			      if (op.equalsIgnoreCase("!="))
-			      {
-			        return new Node("EQI " + op1.content + " " + op2.content, 4);
-			      }
-			      if (op.equalsIgnoreCase("<="))
-			      {
-			        return new Node("GTI " + op1.content + " " + op2.content, 4);
-			      }
-			      if (op.equalsIgnoreCase(">="))
-			      {
-			        return new Node("LTI " + op1.content + " " + op2.content, 4);
-			      }
-			      System.out.println("ERROR");
-			      return null;
+			    	switch(op)
+			    	{
+			    	case("<"):
+			    		return new Node("GEI " + op1.content + " " + op2.content, 4);
+			    	case(">"):
+			    		return new Node("LEI " + op1.content + " " + op2.content, 4);
+			    	case("="):
+			    		return new Node("NEI " + op1.content + " " + op2.content, 4);
+			      	case("!="):
+			      		return new Node("EQI " + op1.content + " " + op2.content, 4);
+			    	case("<="):
+			    		return new Node("GTI " + op1.content + " " + op2.content, 4);
+			      	case(">="):
+			      		return new Node("LTI " + op1.content + " " + op2.content, 4);
+			      	default:
+			      		System.out.println("ERROR");
+			      		return null;
+			    	}
 			    }
-			    if (op.equalsIgnoreCase("<"))
+			    else
 			    {
-			      return new Node("GEF " + op1.content + " " + op2.content, 4);
+			    	switch(op)
+			    	{
+			    	case("<"):
+			    		return new Node("GEF " + op1.content + " " + op2.content, 4);
+			    	case(">"):
+			    		return new Node("LEF " + op1.content + " " + op2.content, 4);
+			    	case("="):
+			    		return new Node("NEF " + op1.content + " " + op2.content, 4);
+			      	case("!="):
+			      		return new Node("EQF " + op1.content + " " + op2.content, 4);
+			    	case("<="):
+			    		return new Node("GTF " + op1.content + " " + op2.content, 4);
+			      	case(">="):
+			      		return new Node("LTF " + op1.content + " " + op2.content, 4);
+			      	default:
+			      		System.out.println("ERROR");
+			      		return null;
+			    	}
 			    }
-			    if (op.equalsIgnoreCase(">")) 
-			    {
-			      return new Node("LEF " + op1.content + " " + op2.content, 4);
-			    }
-			    if (op.equalsIgnoreCase("="))
-			    {
-			      return new Node("NEF " + op1.content + " " + op2.content, 4);
-			    }
-			    if (op.equalsIgnoreCase("!="))
-			    {
-			      return new Node("EQF " + op1.content + " " + op2.content, 4);
-			    }
-			    if (op.equalsIgnoreCase("<="))
-			    {
-			      return new Node("GTF " + op1.content + " " + op2.content, 4);
-			    }
-			    if (op.equalsIgnoreCase(">="))
-			    {
-			      return new Node("LTF " + op1.content + " " + op2.content, 4);
-			    }
-			    System.out.println("ERROR");
-			    return null;
 			  }
 			  
 			  public String createLabel()

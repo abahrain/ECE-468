@@ -1,4 +1,4 @@
 public enum ValueType
 {
-  FLOAT,  STRING,  INT;
+	FLOAT, STRING, INT;
 }

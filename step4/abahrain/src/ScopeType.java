@@ -1,4 +1,4 @@
 public enum ScopeType
 {
-  GLOBAL,  MAIN,  LOCAL;
+	GLOBAL,  MAIN,  LOCAL;
 }

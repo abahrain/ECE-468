@@ -1,17 +1,12 @@
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.*;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class MyListener extends MicroBaseListener
 {	
 	MicroParser parser;
 	public SymbolTable table;
 	int countScope = 1;
-	protected Map<String, Integer> functionMap = new LinkedHashMap ();
+	protected Map<String, Integer> functionMap = new LinkedHashMap<>();
 	
 	public MyListener(MicroParser parser)
 	{
