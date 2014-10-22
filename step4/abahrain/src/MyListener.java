@@ -17,15 +17,15 @@ public class MyListener extends MicroBaseListener
 	public void enterFunction_declaration(MicroParser.Function_declarationContext ctx)
 	{
 		this.table.pushScope(ctx.name().getText());
-		if(ctx.any_type().getText().equalsIgnoreCase("INT"))
-		{
-			this.functionMap.put(ctx.name().getText(), Integer.valueOf(1));
-		}
-		else if(ctx.any_type().getText().equalsIgnoreCase("FLOAT"))
+		if(ctx.any_type().getText().equalsIgnoreCase("FLOAT"))
 		{
 			this.functionMap.put(ctx.name().getText(), Integer.valueOf(2));
 		}
-		else
+		else if(ctx.any_type().getText().equalsIgnoreCase("INT"))
+		{
+			this.functionMap.put(ctx.name().getText(), Integer.valueOf(1));
+		}
+		else if(ctx.any_type().getText().equalsIgnoreCase("STRING"))
 		{
 			this.functionMap.put(ctx.name().getText(), Integer.valueOf(6));
 		}
@@ -35,8 +35,6 @@ public class MyListener extends MicroBaseListener
 	{
 		this.table.currentScope().define(new BaseDescriptor(ctx.string().getText()), ctx.name().getText(), ValueType.STRING);
 	}
-	
-	public void enterProgram(MicroParser.ProgramContext ctx) {}
 	
 	public void exitVariable_declaration_list(MicroParser.Variable_declaration_listContext ctx)
 	{
