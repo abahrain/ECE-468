@@ -4,20 +4,20 @@ import java.util.Map;
 import java.util.Stack;
 import org.antlr.v4.runtime.tree.*;
 
-public class MyVisitor extends MicroBaseVisitor<Node>
+public class MyVisitor extends MicroBaseVisitor<NodeStructure>
 {
 	
 	public ArrayList<String> output = new ArrayList<>();
 	public ArrayList<String> Stack_of_Pushes = new ArrayList<>();
 	private Stack<String> Stack_of_Labels = new Stack<>();
 	private Stack<String> Stack_of_Functions = new Stack<>();
-	private Stack<Integer> functionPopNumberStack = new Stack<>();
-	private Stack<ArrayList<Node>> factorStack = new Stack<>();
-	private Stack<ArrayList<Node>> exprStack = new Stack<>();
-	protected Map<String, Map<String, Node>> tableMap = new LinkedHashMap<>();
+	private Stack<Integer> pop_Number_on_FunctionStack = new Stack<>();
+	private Stack<ArrayList<NodeStructure>> factorStack = new Stack<>();
+	private Stack<ArrayList<NodeStructure>> expressionStack = new Stack<>();
+	protected Map<String, Map<String, NodeStructure>> tableMap = new LinkedHashMap<>();
 	protected Map<String, Integer> functionMap = new LinkedHashMap<>();
-	protected Map<String, ArrayList<String>> tempMap = new LinkedHashMap<>();
-	private int tempIndex = 0;
+	protected Map<String, ArrayList<String>> temporaryMap = new LinkedHashMap<>();
+	private int temporaryIndex = 0;
 	public int finalTempIndex = 0;
 	private int varIndex = 0;
 	private int paramIndex = 0;
@@ -28,24 +28,24 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 	public MyVisitor(SymbolTable table, Map<String, Integer> functionMap)
 	{
 		this.functionMap = functionMap;
-		for(Scope scope : table.scopeStack.subList(0,table.scopeStack.size()))
+		for(Boresight scope : table.scopeBlocks.subList(0,table.scopeBlocks.size()))
 		{
-			Map<String, Node> varMap = new LinkedHashMap<>();
+			Map<String, NodeStructure> varMap = new LinkedHashMap<>();
 			if(scope.type.equals("GLOBAL"))
 			{
 				for (String key : scope.symbolMap.keySet()) 
 				{
-			          if (((Symbol)scope.symbolMap.get(key)).type == ValueType.INT)
+			          if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.INT)
 			          {
-			            varMap.put(key, new Node(key, 1));
+			            varMap.put(key, new NodeStructure(key, 1));
 			          } 
-			          else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.FLOAT) 
+			          else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.FLOAT) 
 			          {
-			            varMap.put(key, new Node(key, 2));
+			            varMap.put(key, new NodeStructure(key, 2));
 			          } 
-			          else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.STRING) 
+			          else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.STRING) 
 			          {
-			            varMap.put(key, new Node(key, 5));
+			            varMap.put(key, new NodeStructure(key, 5));
 			          } 
 			          else
 			          {
@@ -55,36 +55,36 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			      } else {
 			        for (String key : scope.symbolMap.keySet())
 			        {
-			          if (((Symbol)scope.symbolMap.get(key)).descriptor.isParameter)
+			          if (((BuildNode)scope.symbolMap.get(key)).descriptor.query)
 			          {
-			            if (((Symbol)scope.symbolMap.get(key)).type == ValueType.INT) 
+			            if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.INT) 
 			            {
-			              varMap.put(key, new Node(createVar(true), 1));
+			              varMap.put(key, new NodeStructure(createVar(true), 1));
 			            } 
-			            else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.FLOAT) 
+			            else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.FLOAT) 
 			            {
-			              varMap.put(key, new Node(createVar(true), 2));
+			              varMap.put(key, new NodeStructure(createVar(true), 2));
 			            } 
-			            else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.STRING)
+			            else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.STRING)
 			            {
-			              varMap.put(key, new Node(key, 5));
+			              varMap.put(key, new NodeStructure(key, 5));
 			            } 
 			            else 
 			            {
 			              System.out.println("ERROR");
 			            }
 			          }
-			          else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.INT) 
+			          else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.INT) 
 			          {
-			            varMap.put(key, new Node(createVar(false), 1));
+			            varMap.put(key, new NodeStructure(createVar(false), 1));
 			          } 
-			          else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.FLOAT) 
+			          else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.FLOAT) 
 			          {
-			            varMap.put(key, new Node(createVar(false), 2));
+			            varMap.put(key, new NodeStructure(createVar(false), 2));
 			          }
-			          else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.STRING)
+			          else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.STRING)
 			          {
-			            varMap.put(key, new Node(key, 5));
+			            varMap.put(key, new NodeStructure(key, 5));
 			          } 
 			          else 
 			          {
@@ -109,25 +109,25 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    return "$L" + Integer.toString(this.varIndex);
 			  }
 			  
-			  public Node findNameNode(String name, String scopeName)
+			  public NodeStructure findNameNode(String name, String scopeName)
 			  {
-			    if (((Map)this.tableMap.get(scopeName)).get(name) == null)
+			    if ((this.tableMap.get(scopeName)).get(name) == null)
 			    {
-			      if (((Map)this.tableMap.get("GLOBAL")).get(name) == null)
+			      if ((this.tableMap.get("GLOBAL")).get(name) == null)
 			      {
 			        System.out.println("ERROR");
 			        return null;
 			      }
-			      return (Node)((Map)this.tableMap.get("GLOBAL")).get(name);
+			      return (NodeStructure)(this.tableMap.get("GLOBAL")).get(name);
 			    }
-			    return (Node)((Map)this.tableMap.get(scopeName)).get(name);
+			    return (NodeStructure)(this.tableMap.get(scopeName)).get(name);
 			  }
 			  
-			  public Node visitPrimary(MicroParser.PrimaryContext ctx)
+			  public NodeStructure visitPrimary(MicroParser.PrimaryContext ctx)
 			  {
 			    if (ctx.expression() != null) 
 			    {
-			      return (Node)visit(ctx.expression());
+			      return (NodeStructure)visit(ctx.expression());
 			    }
 			    if (ctx.name() != null) 
 			    {
@@ -135,27 +135,27 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    }
 			    if (ctx.INTLITERAL() != null)
 			    {
-			      Node newNode = new Node(createTemp(), 1);
+			      NodeStructure newNode = new NodeStructure(createTemp(), 1);
 			      this.output.add("STOREI " + ctx.INTLITERAL().getText() + " " + newNode.content);
 			      
 			      return newNode;
 			    }
-			    Node newNode = new Node(createTemp(), 2);
+			    NodeStructure newNode = new NodeStructure(createTemp(), 2);
 			    this.output.add("STOREF " + ctx.FLOATLITERAL().getText() + " " + newNode.content);
 			    
 			    return newNode;
 			  }
 			  
-			  public Node visitFunction_declaration(MicroParser.Function_declarationContext ctx)
+			  public NodeStructure visitFunction_declaration(MicroParser.Function_declarationContext ctx)
 			  {
 			    ArrayList<String> newTempList = new ArrayList<>();
 			    
 			    this.output.add("LABEL " + ctx.name().getText());
 			    this.functionRecord = ctx.name().getText();
-			    this.tempMap.put(this.functionRecord, newTempList);
+			    this.temporaryMap.put(this.functionRecord, newTempList);
 			    this.output.add("LINK ");
 			    visitChildren(ctx);
-			    this.tempIndex = 0;
+			    this.temporaryIndex = 0;
 			    if (ctx.any_type().getText().equals("VOID"))
 			    {
 			      this.output.add("RET");
@@ -163,9 +163,9 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    return null;
 			  }
 			  
-			  public Node visitExpression_call(MicroParser.Expression_callContext ctx)
+			  public NodeStructure visitExpression_call(MicroParser.Expression_callContext ctx)
 			  {
-			    this.functionPopNumberStack.push(Integer.valueOf(this.countPUSH));
+			    this.pop_Number_on_FunctionStack.push(Integer.valueOf(this.countPUSH));
 			    this.countPUSH = 0;
 			    if (ctx.expression_list() != null)
 			    {
@@ -185,143 +185,143 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    {
 			      this.output.add("POP ");
 			    }
-			    this.countPUSH = ((Integer)this.functionPopNumberStack.pop()).intValue();
+			    this.countPUSH = ((Integer)this.pop_Number_on_FunctionStack.pop()).intValue();
 			    
-			    Node newNode = new Node(createTemp(), ((Integer)this.functionMap.get(this.functionRecord)).intValue());
+			    NodeStructure newNode = new NodeStructure(createTemp(), ((Integer)this.functionMap.get(this.functionRecord)).intValue());
 			    this.output.add("POP " + newNode.content);
 			    return newNode;
 			  }
 			  
-			  public Node visitExpression_list(MicroParser.Expression_listContext ctx)
+			  public NodeStructure visitExpression_list(MicroParser.Expression_listContext ctx)
 			  {
-			  	ParseTree temp = (ParseTree)ctx.expression();
-			    Node exprNode = (Node)visit(temp);
+			  	ParseTree temporary_tree = (ParseTree)ctx.expression();
+			    NodeStructure expressionNode = (NodeStructure)visit(temporary_tree);
 			    
 
-			    this.Stack_of_Functions.push(exprNode.content);
+			    this.Stack_of_Functions.push(expressionNode.content);
 			    this.countPUSH += 1;
-			    temp = (ParseTree)ctx.expression_list_repeat();
-			    if (!"".equals(temp.getText())) 
+			    temporary_tree = (ParseTree)ctx.expression_list_repeat();
+			    if (!temporary_tree.getText().isEmpty()) 
 			    {
-			      	visit(temp);
+			      	visit(temporary_tree);
 			    }
 			    return null;
 			  }
 			  
-			  public Node visitExpression_list_repeat(MicroParser.Expression_list_repeatContext ctx)
+			  public NodeStructure visitExpression_list_repeat(MicroParser.Expression_list_repeatContext ctx)
 			  {
-			  	ParseTree temp = (ParseTree)ctx.expression();
-			    Node exprNode = (Node)visit(temp);
+			  	ParseTree temporary_tree = (ParseTree)ctx.expression();
+			    NodeStructure expressionNode = (NodeStructure)visit(temporary_tree);
 			    
-			    this.Stack_of_Functions.push(exprNode.content);
+			    this.Stack_of_Functions.push(expressionNode.content);
 			    this.countPUSH += 1;
-			    temp = (ParseTree)ctx.expression_list_repeat();
-			    if (!"".equals(temp.getText())) 
+			    temporary_tree = (ParseTree)ctx.expression_list_repeat();
+			    if (!temporary_tree.getText().isEmpty()) 
 			    {
-			      	visit(temp);
+			      	visit(temporary_tree);
 			    }
 			    return null;
 			  }
 			  
-			  public Node visitRe_turn(MicroParser.Re_turnContext ctx)
+			  public NodeStructure visitRe_turn(MicroParser.Re_turnContext ctx)
 			  {
-			    Node exprNode = (Node)visit(ctx.expression());
-			    Node tempNode = new Node(createTemp(), exprNode.type);
-			    if (exprNode.type == 1)
+			    NodeStructure expressionNode = (NodeStructure)visit(ctx.expression());
+			    NodeStructure temporary_Node = new NodeStructure(createTemp(), expressionNode.type);
+			    if (expressionNode.type == 1)
 			    {
-			      this.output.add("STOREI " + exprNode + " " + tempNode);
-			      this.output.add("STOREI " + tempNode + " $R");
+			      this.output.add("STOREI " + expressionNode + " " + temporary_Node);
+			      this.output.add("STOREI " + temporary_Node + " $R");
 			    }
 			    else
 			    {
-			      this.output.add("STOREF " + exprNode + " " + tempNode);
-			      this.output.add("STOREF " + tempNode + " $R");
+			      this.output.add("STOREF " + expressionNode + " " + temporary_Node);
+			      this.output.add("STOREF " + temporary_Node + " $R");
 			    }
 			    this.output.add("RET");
 			    return null;
 			  }
 			  
-			  public Node visitParameter_declaration(MicroParser.Parameter_declarationContext ctx)
+			  public NodeStructure visitParameter_declaration(MicroParser.Parameter_declarationContext ctx)
 			  {
-			    Node newNode = null;
-			    if (ctx.variable_type().getText().equalsIgnoreCase("INT")) 
+			    NodeStructure newNode = null;
+			    if (ctx.variable_type().getText().equals("INT")) 
 			    {
-			      newNode = new Node(ctx.name().getText(), 1);
+			      newNode = new NodeStructure(ctx.name().getText(), 1);
 			    } 
 			    else 
 			    {
-			      newNode = new Node(ctx.name().getText(), 2);
+			      newNode = new NodeStructure(ctx.name().getText(), 2);
 			    }
 			    return newNode;
 			  }
 			  
-			  public Node visitExpression(MicroParser.ExpressionContext ctx)
+			  public NodeStructure visitExpression(MicroParser.ExpressionContext ctx)
 			  {
-			    if (!"".equals(ctx.pre_expression().getText()))
+			    if (!ctx.pre_expression().getText().isEmpty())
 			    {
-			      ArrayList<Node> exprList = new ArrayList<>();
-			      this.exprStack.push(exprList);
-			      Node exprNode = (Node)visit(ctx.pre_expression());
-			      Node factorNode = (Node)visit(ctx.factor());
-			      ((ArrayList)this.exprStack.peek()).add(factorNode);
-			      Node resolveNode = resolve((ArrayList)this.exprStack.pop());
+			      ArrayList<NodeStructure> exprList = new ArrayList<>();
+			      this.expressionStack.push(exprList);
+			      visit(ctx.pre_expression());
+			      NodeStructure factorNode = (NodeStructure)visit(ctx.factor());
+			      ((ArrayList<NodeStructure>)this.expressionStack.peek()).add(factorNode);
+			      NodeStructure resolveNode = resolve(this.expressionStack.pop());
 			      
 			      return resolveNode;
 			    }
-			    Node factorNode = (Node)visit(ctx.factor());
+			    NodeStructure factorNode = (NodeStructure)visit(ctx.factor());
 			    return factorNode;
 			  }
 			  
-			  public Node visitPre_expression(MicroParser.Pre_expressionContext ctx)
+			  public NodeStructure visitPre_expression(MicroParser.Pre_expressionContext ctx)
 			  {
-			    if (!"".equals(ctx.pre_expression().getText())) 
+			    if (!ctx.pre_expression().getText().isEmpty()) 
 			    {
 			      visit(ctx.pre_expression());
 			    }
-			    Node opNode = new Node(ctx.addition_operation().getText(), 3);
-			    Node factorNode = (Node)visit(ctx.factor());
-			    ((ArrayList)this.exprStack.peek()).add(factorNode);
-			    ((ArrayList)this.exprStack.peek()).add(opNode);
+			    NodeStructure operation_Node = new NodeStructure(ctx.addition_operation().getText(), 3);
+			    NodeStructure factorNode = (NodeStructure)visit(ctx.factor());
+			    ((ArrayList<NodeStructure>)this.expressionStack.peek()).add(factorNode);
+			    ((ArrayList<NodeStructure>)this.expressionStack.peek()).add(operation_Node);
 			    
 			    return null;
 			  }
 			  
-			  public Node visitFactor(MicroParser.FactorContext ctx)
+			  public NodeStructure visitFactor(MicroParser.FactorContext ctx)
 			  {
-			    if (!"".equals(ctx.pre_factor().getText()))
+			    if (!ctx.pre_factor().getText().isEmpty())
 			    {
-			      ArrayList<Node> factorList = new ArrayList();
+			      ArrayList<NodeStructure> factorList = new ArrayList<>();
 			      this.factorStack.push(factorList);
-			      Node exprNode = (Node)visit(ctx.pre_factor());
-			      Node postfixNode = (Node)visit(ctx.post_expression());
-			      ((ArrayList)this.factorStack.peek()).add(postfixNode);
-			      Node resolveNode = resolve((ArrayList)this.factorStack.pop());
+			      visit(ctx.pre_factor());
+			      NodeStructure post_expressionNode = (NodeStructure)visit(ctx.post_expression());
+			      ((ArrayList<NodeStructure>)this.factorStack.peek()).add(post_expressionNode);
+			      NodeStructure resolveNode = resolve(this.factorStack.pop());
 			      
 			      return resolveNode;
 			    }
-			    return (Node)visit(ctx.post_expression());
+			    return (NodeStructure)visit(ctx.post_expression());
 			  }
 			  
-			  public Node visitPre_factor(MicroParser.Pre_factorContext ctx)
+			  public NodeStructure visitPre_factor(MicroParser.Pre_factorContext ctx)
 			  {
-			    if (!"".equals(ctx.pre_factor().getText())) 
+			    if (!ctx.pre_factor().getText().isEmpty()) 
 			    {
 			      visit(ctx.pre_factor());
 			    }
-			    Node opNode = new Node(ctx.multiplication_operation().getText(), 3);
-			    Node postfixNode = (Node)visit(ctx.post_expression());
-			    ((ArrayList)this.factorStack.peek()).add(postfixNode);
-			    ((ArrayList)this.factorStack.peek()).add(opNode);
+			    NodeStructure operation_Node = new NodeStructure(ctx.multiplication_operation().getText(), 3);
+			    NodeStructure postfixNode = (NodeStructure)visit(ctx.post_expression());
+			    ((ArrayList<NodeStructure>)this.factorStack.peek()).add(postfixNode);
+			    ((ArrayList<NodeStructure>)this.factorStack.peek()).add(operation_Node);
 			    
 			    return null;
 			  }
 			  
-			  public Node visitWrite(MicroParser.WriteContext ctx)
+			  public NodeStructure visitWrite(MicroParser.WriteContext ctx)
 			  {
 			    String[] nameArray = ctx.name_list().getText().split(",");
 			    for (int i = 0; i < nameArray.length; i++)
 			    {
-			      Node newNode = findNameNode(nameArray[i], this.functionRecord);
+			      NodeStructure newNode = findNameNode(nameArray[i], this.functionRecord);
 			      if (newNode.type == 1) 
 			      {
 			        this.output.add("WRITEI " + newNode.content);
@@ -338,12 +338,12 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    return null;
 			  }
 			  
-			  public Node visitRead(MicroParser.ReadContext ctx)
+			  public NodeStructure visitRead(MicroParser.ReadContext ctx)
 			  {
 			    String[] nameArray = ctx.name_list().getText().split(",");
 			    for (int i = 0; i < nameArray.length; i++)
 			    {
-			      Node newNode = findNameNode(nameArray[i], this.functionRecord);
+			      NodeStructure newNode = findNameNode(nameArray[i], this.functionRecord);
 			      if (newNode.type == 1)
 			      {
 			        this.output.add("READI " + newNode.content);
@@ -356,42 +356,41 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    return null;
 			  }
 			  
-			  public Node visitAssignment_frame(MicroParser.Assignment_frameContext ctx)
+			  public NodeStructure visitAssignment_frame(MicroParser.Assignment_frameContext ctx)
 			  {
-			    Node exprNode = (Node)visit(ctx.expression());
-			    Node newNode = findNameNode(ctx.name().getText(), this.functionRecord);
+			    NodeStructure expressionNode = (NodeStructure)visit(ctx.expression());
+			    NodeStructure newNode = findNameNode(ctx.name().getText(), this.functionRecord);
 			    if (newNode.type == 1) 
 			    {
-			      this.output.add("STOREI " + exprNode.content + " " + newNode.content);
+			      this.output.add("STOREI " + expressionNode.content + " " + newNode.content);
 			    } 
 			    else 
 			    {
-			      this.output.add("STOREF " + exprNode.content + " " + newNode.content);
+			      this.output.add("STOREF " + expressionNode.content + " " + newNode.content);
 			    }
 			    return null;
 			  }
 			  
-			  public Node visitWhile_statement(MicroParser.While_statementContext ctx)
+			  public NodeStructure visitWhile_statement(MicroParser.While_statementContext ctx)
 			  {
 			    String newLabel = createLabel();
 			    this.output.add("LABEL " + newLabel);
 			    String newLabel2 = createLabel();
 			    this.Stack_of_Labels.add(newLabel2);
-			    Node comp = (Node)visit(ctx.condition());
 			    
 			    return null;
 			  }
 			  
-			  public Node visitIf_statement(MicroParser.If_statementContext ctx)
+			  public NodeStructure visitIf_statement(MicroParser.If_statementContext ctx)
 			  {
-			    if (!"".equals(ctx.else_portion().getText()))
+			    if (!ctx.else_portion().getText().isEmpty())
 			    {
-			      Node comp = (Node)visit(ctx.condition());
-			      if (comp.content.equalsIgnoreCase("TRUE"))
+			      NodeStructure comp = (NodeStructure)visit(ctx.condition());
+			      if (comp.content.equals("TRUE"))
 			      {
 			        visit(ctx.statement_list());
 			      }
-			      else if (comp.content.equalsIgnoreCase("FALSE"))
+			      else if (comp.content.equals("FALSE"))
 			      {
 			        String newLabel2 = createLabel();
 			        this.Stack_of_Labels.push(newLabel2);
@@ -413,12 +412,12 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    }
 			    else
 			    {
-			      Node comp = (Node)visit(ctx.condition());
-			      if (comp.content.equalsIgnoreCase("TRUE"))
+			      NodeStructure comp = (NodeStructure)visit(ctx.condition());
+			      if (comp.content.equals("TRUE"))
 			      {
 			        visit(ctx.statement_list());
 			      }
-			      else if (!comp.content.equalsIgnoreCase("FALSE"))
+			      else if (!comp.content.equals("FALSE"))
 			      {
 			        String newLabel2 = createLabel();
 			        this.output.add(comp.content + " " + newLabel2);
@@ -429,19 +428,19 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    return null;
 			  }
 			  
-			  public Node visitElse_portion(MicroParser.Else_portionContext ctx)
+			  public NodeStructure visitElse_portion(MicroParser.Else_portionContext ctx)
 			  {
 			    visit(ctx.statement_list());
 			    return null;
 			  }
 			  
-			  public Node visitCondition(MicroParser.ConditionContext ctx)
+			  public NodeStructure visitCondition(MicroParser.ConditionContext ctx)
 			  {
-			    Node op1 = (Node)visit(ctx.expression(0));
+			    NodeStructure left_variable = (NodeStructure)visit(ctx.expression(0));
 			    
 			    visit(ctx.comparison_operator());
-			    Node op2 = (Node)visit(ctx.expression(1));
-			    return resolveComp(op1, op2, ctx.comparison_operator().getText());
+			    NodeStructure right_operation = (NodeStructure)visit(ctx.expression(1));
+			    return determineComparison(left_variable, right_operation, ctx.comparison_operator().getText());
 			  }
 			  
 			  public String resolveDoComp(String input)
@@ -478,24 +477,24 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 				  }
 			  }
 			  
-			  public Node resolveComp(Node op1, Node op2, String op)
+			  public NodeStructure determineComparison(NodeStructure left_variable, NodeStructure right_operation, String operation)
 			  {
-			    if ((op1.type == 1) && (op2.type == 1))
+			    if ((left_variable.type == 1) && (right_operation.type == 1))
 			    {
-			    	switch(op)
+			    	switch(operation)
 			    	{
 			    	case("<"):
-			    		return new Node("GEI " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("GEI " + left_variable.content + " " + right_operation.content, 4);
 			    	case(">"):
-			    		return new Node("LEI " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("LEI " + left_variable.content + " " + right_operation.content, 4);
 			    	case("="):
-			    		return new Node("NEI " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("NEI " + left_variable.content + " " + right_operation.content, 4);
 			      	case("!="):
-			      		return new Node("EQI " + op1.content + " " + op2.content, 4);
+			      		return new NodeStructure("EQI " + left_variable.content + " " + right_operation.content, 4);
 			    	case("<="):
-			    		return new Node("GTI " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("GTI " + left_variable.content + " " + right_operation.content, 4);
 			      	case(">="):
-			      		return new Node("LTI " + op1.content + " " + op2.content, 4);
+			      		return new NodeStructure("LTI " + left_variable.content + " " + right_operation.content, 4);
 			      	default:
 			      		System.out.println("ERROR");
 			      		return null;
@@ -503,20 +502,20 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    }
 			    else
 			    {
-			    	switch(op)
+			    	switch(operation)
 			    	{
 			    	case("<"):
-			    		return new Node("GEF " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("GEF " + left_variable.content + " " + right_operation.content, 4);
 			    	case(">"):
-			    		return new Node("LEF " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("LEF " + left_variable.content + " " + right_operation.content, 4);
 			    	case("="):
-			    		return new Node("NEF " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("NEF " + left_variable.content + " " + right_operation.content, 4);
 			      	case("!="):
-			      		return new Node("EQF " + op1.content + " " + op2.content, 4);
+			      		return new NodeStructure("EQF " + left_variable.content + " " + right_operation.content, 4);
 			    	case("<="):
-			    		return new Node("GTF " + op1.content + " " + op2.content, 4);
+			    		return new NodeStructure("GTF " + left_variable.content + " " + right_operation.content, 4);
 			      	case(">="):
-			      		return new Node("LTF " + op1.content + " " + op2.content, 4);
+			      		return new NodeStructure("LTF " + left_variable.content + " " + right_operation.content, 4);
 			      	default:
 			      		System.out.println("ERROR");
 			      		return null;
@@ -532,80 +531,81 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			  
 			  public String createTemp()
 			  {
-			    this.tempIndex += 1;
-			    if (this.tempIndex > this.finalTempIndex)
+			    this.temporaryIndex += 1;
+			    if (this.temporaryIndex > this.finalTempIndex)
 			    {
-			      this.finalTempIndex = this.tempIndex;
+			      this.finalTempIndex = this.temporaryIndex;
 			    }
-			    ((ArrayList)this.tempMap.get(this.functionRecord)).add("$T" + Integer.toString(this.tempIndex));
-			    return "$T" + Integer.toString(this.tempIndex);
+			    ((ArrayList<String>)this.temporaryMap.get(this.functionRecord)).add("$T" + Integer.toString(this.temporaryIndex));
+			    return "$T" + Integer.toString(this.temporaryIndex);
 			  }
 			  
-			  public Node resolve(ArrayList<Node> input)
+			  public NodeStructure resolve(ArrayList<NodeStructure> input)
 			  {
 			    while (input.size() >= 3)
 			    {
-			      Node op1 = (Node)input.get(0);
-			      Node op = (Node)input.get(1);
-			      Node op2 = (Node)input.get(2);
+			      NodeStructure left_variable = (NodeStructure)input.get(0);
+			      NodeStructure operation = (NodeStructure)input.get(1);
+			      NodeStructure right_operation = (NodeStructure)input.get(2);
 			      
-			      Node newNode = new Node(createTemp(), op1.type);
-			      if (op.content.equalsIgnoreCase("+"))
+			      NodeStructure newNode = new NodeStructure(createTemp(), left_variable.type);
+			      if (operation.content.equals("+"))
 			      {
-			        if (op1.type == 1)
+			        if (left_variable.type == 1)
 			        {
-			          String output = "ADDI " + op1.content + " " + op2.content + " " + newNode.content;
+			          String output = "ADDI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			          this.output.add(output);
 			        }
 			        else
 			        {
-			          String output = "ADDF " + op1.content + " " + op2.content + " " + newNode.content;
+			          String output = "ADDF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			          this.output.add(output);
 			        }
 			      }
-			      else if (op.content.equalsIgnoreCase("-"))
+			      else if (operation.content.equals("-"))
 			      {
-			        if (op1.type == 1)
+			        if (left_variable.type == 1)
 			        {
-			          String output = "SUBI " + op1.content + " " + op2.content + " " + newNode.content;
+			          String output = "SUBI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			          this.output.add(output);
 			        }
 			        else
 			        {
-			          String output = "SUBF " + op1.content + " " + op2.content + " " + newNode.content;
+			          String output = "SUBF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			          this.output.add(output);
 			        }
 			      }
-			      else if (op.content.equalsIgnoreCase("*"))
+			      else if (operation.content.equals("*"))
 			      {
-			        if (op1.type == 1)
+			        if (left_variable.type == 1)
 			        {
-			          String output = "MULTI " + op1.content + " " + op2.content + " " + newNode.content;
+			          String output = "MULTI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			          this.output.add(output);
 			        }
 			        else
 			        {
-			          String output = "MULTF " + op1.content + " " + op2.content + " " + newNode.content;
+			          String output = "MULTF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			          this.output.add(output);
 			        }
 			      }
-			      else if (op1.type == 1)
+			      else if (left_variable.type == 1)
 			      {
-			        String output = "DIVI " + op1.content + " " + op2.content + " " + newNode.content;
+			        String output = "DIVI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			        this.output.add(output);
 			      }
 			      else
 			      {
-			        String output = "DIVF " + op1.content + " " + op2.content + " " + newNode.content;
+			        String output = "DIVF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
 			        this.output.add(output);
 			      }
-			      input.remove(0);
-			      input.remove(0);
-			      input.remove(0);
+			      for(int a = 0; a < 3; a++)
+			      {
+			    	  input.remove(0);
+			      }
 			      
 			      input.add(0, newNode);
 			    }
-			    Node returnValue = (Node)input.get(0);
+			    NodeStructure returnValue = (NodeStructure)input.get(0);
 			    input.removeAll(input);
 			    return returnValue;
 			  }
@@ -615,8 +615,7 @@ public class MyVisitor extends MicroBaseVisitor<Node>
 			    String result = "";
 			    for (int i = 0; i < this.output.size(); i++)
 			    {
-			      result = result + (String)this.output.get(i);
-			      result = result + "\n";
+			      result = result + (String)this.output.get(i)+"\n";
 			    }
 			    return result;
 			  }

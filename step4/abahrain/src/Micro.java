@@ -4,8 +4,8 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 /*import java.util.Arrays;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import org.antlr.v4.runtime.tree.gui.TreeViewer;*/
-
+import org.antlr.v4.runtime.tree.gui.TreeViewer;
+*/
 public class Micro 
 {
   public static void main(String[] args) throws Exception
@@ -28,8 +28,7 @@ public class Micro
 		//System.out.println(tree.toStringTree(parse));
 		MyVisitor visited = new MyVisitor(listen.table, listen.functionMap);
 		visited.visit(tree);
-		IRToTiny translate = new IRToTiny(visited.output, listen.table);
-		System.out.println(translate);
+		System.out.print(new tinyDancer(visited.output, listen.table));
 		//System.out.println("BOOM!");
 		/*JFrame frame = new JFrame("Antlr AST");
         JPanel panel = new JPanel();

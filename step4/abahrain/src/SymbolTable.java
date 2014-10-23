@@ -1,15 +1,14 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
 public class SymbolTable
 {
-  protected Stack<Scope> scopeStack;
-  protected ArrayList<Scope> allScopes;
-  protected int genId;
+  protected Stack<Boresight> scopeBlocks;
+  protected ArrayList<Boresight> scopesTower;
+  protected int generateName;
   
   public SymbolTable()
   {
@@ -18,41 +17,41 @@ public class SymbolTable
   
   private void init()
   {
-    this.scopeStack = new Stack<>();
-    this.allScopes = new ArrayList<>();
-    this.genId = 0;
+    this.scopeBlocks = new Stack<>();
+    this.scopesTower = new ArrayList<>();
+    this.generateName = 0;
     
-    Scope globals = new Scope("GLOBAL", nextGenId(), null);
-    this.scopeStack.push(globals);
-    this.allScopes.add(globals);
+    Boresight globals = new Boresight("GLOBAL", nextGenId(), null);
+    this.scopeBlocks.push(globals);
+    this.scopesTower.add(globals);
   }
   
-  public Scope pushScope(String type)
+  public Boresight pushScope(String type)
   {
-    Scope enclosingScope = (Scope)this.scopeStack.peek();
-    Scope scope = new Scope(type, nextGenId(), enclosingScope);
-    this.scopeStack.push(scope);
-    this.allScopes.add(scope);
+    Boresight enclosingScope = (Boresight)this.scopeBlocks.peek();
+    Boresight scope = new Boresight(type, nextGenId(), enclosingScope);
+    this.scopeBlocks.push(scope);
+    this.scopesTower.add(scope);
     return scope;
   }
   
   public void popScope()
   {
-    this.scopeStack.pop();
+    this.scopeBlocks.pop();
   }
   
-  public Scope currentScope()
+  public Boresight currentScope()
   {
-    if (this.scopeStack.size() > 0) {
-      return (Scope)this.scopeStack.peek();
+    if (this.scopeBlocks.size() > 0) {
+      return (Boresight)this.scopeBlocks.peek();
     }
-    return (Scope)this.allScopes.get(0);
+    return (Boresight)this.scopesTower.get(0);
   }
   
-  public Scope getScope(int genId)
+  public Boresight getScope(int generateName)
   {
-    for (Scope scope : this.scopeStack) {
-      if (scope.genId == genId) {
+    for (Boresight scope : this.scopeBlocks) {
+      if (scope.generateName == generateName) {
         return scope;
       }
     }
@@ -61,8 +60,8 @@ public class SymbolTable
   
   private int nextGenId()
   {
-    this.genId += 1;
-    return this.genId;
+    this.generateName += 1;
+    return this.generateName;
   }
   
   public List<String> checkDuplicate()
@@ -70,7 +69,7 @@ public class SymbolTable
     List<String> nameArray = new ArrayList<>();
     List<String> outDuplicate = new ArrayList<>();
     Set<String> array = new HashSet<>();
-    for (Scope scope : this.scopeStack.subList(0, this.scopeStack.size())) 
+    for (Boresight scope : this.scopeBlocks.subList(0, this.scopeBlocks.size())) 
     {
       nameArray.addAll(scope.symbolMap.keySet());
     }
@@ -85,7 +84,7 @@ public class SymbolTable
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    for (Scope scope : this.scopeStack.subList(0, this.scopeStack.size())) {
+    for (Boresight scope : this.scopeBlocks.subList(0, this.scopeBlocks.size())) {
       sb.append("Symbol table " + scope.type + "\n" + scope.toString() + "\n");
     }
     String temp = sb.toString().replace("[", "").replace("]", "");

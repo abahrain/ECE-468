@@ -1,4 +1,4 @@
-public enum ScopeType
+public enum FunctionType
 {
 	GLOBAL,  MAIN,  LOCAL;
 }

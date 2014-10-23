@@ -1,18 +1,18 @@
-public class Symbol
+public class BuildNode
 {
-	protected Scope scope;
-	protected BaseDescriptor descriptor;
+	protected Boresight scope;
+	protected Quantifier descriptor;
 	protected String name;
-	protected ValueType type;
+	protected VariableType type;
 
-	public Symbol(BaseDescriptor descriptor, String name, ValueType type)
+	public BuildNode(Quantifier descriptor, String name, VariableType type)
 	{
 		this.descriptor = descriptor;
 		this.name = name;
 		this.type = type;
 	}
 
-	public BaseDescriptor getDescriptor()
+	public Quantifier getDescriptor()
 	{
 		return this.descriptor;
 	}
@@ -22,31 +22,31 @@ public class Symbol
 			return this.name;
 	}
 
-	public ValueType getType()
+	public VariableType getType()
 	{
 		return this.type;
 	}
 
-	public void setScope(Scope scope)
+	public void setNode(Boresight scope)
 	{
 		this.scope = scope;
 	}
   
-	public Scope getScope()
+	public Boresight getNode()
 	{
 		return this.scope;
 	}
 
 	public int genId()
 	{
-		return this.scope.genId;
+		return this.scope.generateName;
 	}
 
 	public String toString()
 	{
 		if (this.type != null)
 		{
-			if (this.type == ValueType.STRING)
+			if (this.type == VariableType.STRING)
 			{
 				return "name " + getName() + " type " + this.type + " value " + this.descriptor.content + "\n";
 			}

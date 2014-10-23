@@ -17,15 +17,15 @@ public class MyListener extends MicroBaseListener
 	public void enterFunction_declaration(MicroParser.Function_declarationContext ctx)
 	{
 		this.table.pushScope(ctx.name().getText());
-		if(ctx.any_type().getText().equalsIgnoreCase("FLOAT"))
+		if(ctx.any_type().getText().equals("FLOAT"))
 		{
 			this.functionMap.put(ctx.name().getText(), Integer.valueOf(2));
 		}
-		else if(ctx.any_type().getText().equalsIgnoreCase("INT"))
+		else if(ctx.any_type().getText().equals("INT"))
 		{
 			this.functionMap.put(ctx.name().getText(), Integer.valueOf(1));
 		}
-		else if(ctx.any_type().getText().equalsIgnoreCase("STRING"))
+		else if(ctx.any_type().getText().equals("STRING"))
 		{
 			this.functionMap.put(ctx.name().getText(), Integer.valueOf(6));
 		}
@@ -33,7 +33,7 @@ public class MyListener extends MicroBaseListener
 	
 	public void exitString_declaration_list(MicroParser.String_declaration_listContext ctx)
 	{
-		this.table.currentScope().define(new BaseDescriptor(ctx.string().getText()), ctx.name().getText(), ValueType.STRING);
+		this.table.currentScope().interpret(new Quantifier(ctx.string().getText()), ctx.name().getText(), VariableType.STRING);
 	}
 	
 	public void exitVariable_declaration_list(MicroParser.Variable_declaration_listContext ctx)
@@ -45,14 +45,14 @@ public class MyListener extends MicroBaseListener
 		{
 			for(String var : array)
 			{
-				this.table.currentScope().define(new BaseDescriptor(), var, ValueType.INT);
+				this.table.currentScope().interpret(new Quantifier(), var, VariableType.INT);
 			}
 		}
 		else
 		{
 			for(String var : array)
 			{
-				this.table.currentScope().define(new BaseDescriptor(), var, ValueType.FLOAT);
+				this.table.currentScope().interpret(new Quantifier(), var, VariableType.FLOAT);
 			}
 		}		
 	}
@@ -85,11 +85,11 @@ public class MyListener extends MicroBaseListener
 	{
 		if(ctx.variable_type().getText().equals("INT"))
 		{
-			this.table.currentScope().define(new BaseDescriptor(), ctx.name().getText(), ValueType.INT);
+			this.table.currentScope().interpret(new Quantifier(), ctx.name().getText(), VariableType.INT);
 		}
 		else
 		{
-			this.table.currentScope().define(new BaseDescriptor(), ctx.name().getText(), ValueType.FLOAT);
+			this.table.currentScope().interpret(new Quantifier(), ctx.name().getText(), VariableType.FLOAT);
 		}
 	}
 	
@@ -111,12 +111,12 @@ public class MyListener extends MicroBaseListener
 		public String toString()
 		{
 			StringBuilder string = new StringBuilder();
-			Set<String> indexs = information.keySet();
+			Set<String> indexes = information.keySet();
 			if(indexs.size() > 0)
 			{
 				string.append(title);
 				string.append("-");
-				for(String index : indexs)
+				for(String index : indexes)
 				{
 					string.append(index);
 					string.append(": ");

@@ -1,9 +1,9 @@
-public class Node
+public class NodeStructure
 	{
 		public String content;
 		public int type;
 	   
-		public Node(String newContent, int newType)
+		public NodeStructure(String newContent, int newType)
 		{
 			this.content = newContent;
 			this.type = newType;
