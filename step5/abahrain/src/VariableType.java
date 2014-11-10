@@ -1,4 +1,4 @@
 public enum VariableType
 {
-	FLOAT, STRING, INT;
+  FLOAT,  STRING,  INT;
 }

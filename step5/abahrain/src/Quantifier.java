@@ -1,16 +1,16 @@
 class Quantifier
 {
   String content = "default";
-  boolean query = false;
+  boolean isParameter = false;
   
   public Quantifier(String input)
   {
     this.content = input;
   }
   
-  public Quantifier(boolean premise)
+  public Quantifier(boolean justify)
   {
-    this.query = premise;
+    this.isParameter = justify;
   }
   
   public Quantifier() {}

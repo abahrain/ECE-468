@@ -1,4 +1,4 @@
 public enum FunctionType
 {
-	GLOBAL,  MAIN,  LOCAL;
+  GLOBAL,  MAIN,  LOCAL;
 }
