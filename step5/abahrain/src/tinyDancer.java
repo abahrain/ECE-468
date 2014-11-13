@@ -4,28 +4,28 @@ import java.util.Map;
 
 public class TinyDancer
 {
-  ArrayList<String> IR;
+  ArrayList<String> Intermediate_Representation;
   String result = "";
-  SymbolTable table;
+  SymbolTable information_table;
   public int tempIndex = -1;
   Map<String, String> TR = new LinkedHashMap<String, String>();
   
-  public TinyDancer(ArrayList<String> input, SymbolTable table)
+  public TinyDancer(ArrayList<String> input, SymbolTable information_table)
   {
-    this.IR = input;
-    this.table = table;
+    this.Intermediate_Representation = input;
+    this.information_table = information_table;
   }
   
   public String toString()
   {
     this.result = this.result.concat(";IR code\n");
-    for (int i = 0; i < this.IR.size(); i++) {
-      this.result = this.result.concat(";" + (String)this.IR.get(i) + "\n");
+    for (int i = 0; i < this.Intermediate_Representation.size(); i++) {
+      this.result = this.result.concat(";" + (String)this.Intermediate_Representation.get(i) + "\n");
     }
     this.result = this.result.concat(";tiny code\n");
     
 
-    String[] varTable = this.table.toString().split(" ");
+    String[] varTable = this.information_table.toString().split(" ");
     for (int i = 0; i < varTable.length; i++) {
       if (varTable[i].contains("name")) {
         if (varTable[(i + 3)].contains("STRING")) {
@@ -35,536 +35,536 @@ public class TinyDancer
         }
       }
     }
-    for (int i = 0; i < this.IR.size(); i++)
+    for (int i = 0; i < this.Intermediate_Representation.size(); i++)
     {
-      String[] elements = ((String)this.IR.get(i)).split(" ");
-      if (elements[0].equalsIgnoreCase("STOREI"))
+      String[] string_chunk = ((String)this.Intermediate_Representation.get(i)).split(" ");
+      if (string_chunk[0].equalsIgnoreCase("STOREI"))
       {
-        if (elements[1].contains("$T"))
+        if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + elements[2] + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + string_chunk[2] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[2]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("move " + createTemp(elements[2]) + " " + elements[2] + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[2]) + " " + string_chunk[2] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("MULTI"))
+      else if (string_chunk[0].equalsIgnoreCase("MULTI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("muli " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("muli " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("muli " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("muli " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("muli " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("muli " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("muli " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("muli " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("ADDI"))
+      else if (string_chunk[0].equalsIgnoreCase("ADDI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addi " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addi " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addi " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addi " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addi " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addi " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addi " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addi " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("DIVI"))
+      else if (string_chunk[0].equalsIgnoreCase("DIVI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divi " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divi " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divi " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divi " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divi " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divi " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divi " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divi " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("SUBI"))
+      else if (string_chunk[0].equalsIgnoreCase("SUBI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subi " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subi " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subi " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subi " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subi " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subi " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subi " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subi " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("WRITEI")) {
-        this.result = this.result.concat("sys writei " + elements[1] + " " + "\n");
-      } else if (elements[0].equalsIgnoreCase("WRITES")) {
-        this.result = this.result.concat("sys writes " + elements[1] + "\n");
-      } else if (elements[0].equalsIgnoreCase("READI")) {
-        this.result = this.result.concat("sys readi " + elements[1] + " " + "\n");
-      } else if (elements[0].equalsIgnoreCase("STOREF"))
+      else if (string_chunk[0].equalsIgnoreCase("WRITEI")) {
+        this.result = this.result.concat("sys writei " + string_chunk[1] + " " + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("WRITES")) {
+        this.result = this.result.concat("sys writes " + string_chunk[1] + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("READI")) {
+        this.result = this.result.concat("sys readi " + string_chunk[1] + " " + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("STOREF"))
       {
-        if (elements[1].contains("$T"))
+        if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + elements[2] + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + string_chunk[2] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[2]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("move " + createTemp(elements[2]) + " " + elements[2] + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[2]) + " " + string_chunk[2] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("MULTF"))
+      else if (string_chunk[0].equalsIgnoreCase("MULTF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("mulr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("mulr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("mulr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("mulr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("mulr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("mulr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("mulr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("mulr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("ADDF"))
+      else if (string_chunk[0].equalsIgnoreCase("ADDF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("addr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("addr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("DIVF"))
+      else if (string_chunk[0].equalsIgnoreCase("DIVF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("divr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("divr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("SUBF"))
+      else if (string_chunk[0].equalsIgnoreCase("SUBF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + createTemp(elements[1]) + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subr " + createTemp(elements[2]) + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subr " + createTemp(string_chunk[2]) + " " + createTemp(string_chunk[3]) + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[1] + " " + createTemp(elements[3]) + "\n");
-          this.result = this.result.concat("subr " + elements[2] + " " + createTemp(elements[3]) + "\n");
+          this.result = this.result.concat("move " + string_chunk[1] + " " + createTemp(string_chunk[3]) + "\n");
+          this.result = this.result.concat("subr " + string_chunk[2] + " " + createTemp(string_chunk[3]) + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("WRITEF")) {
-        this.result = this.result.concat("sys writer " + elements[1] + " " + "\n");
-      } else if (elements[0].equalsIgnoreCase("READF")) {
-        this.result = this.result.concat("sys readr " + elements[1] + " " + "\n");
-      } else if (elements[0].equalsIgnoreCase("LABEL")) {
-        this.result = this.result.concat("label " + elements[1] + " " + "\n");
-      } else if (elements[0].equalsIgnoreCase("JUMP")) {
-        this.result = this.result.concat("jmp " + elements[1] + " " + "\n");
-      } else if (elements[0].equalsIgnoreCase("LEI"))
+      else if (string_chunk[0].equalsIgnoreCase("WRITEF")) {
+        this.result = this.result.concat("sys writer " + string_chunk[1] + " " + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("READF")) {
+        this.result = this.result.concat("sys readr " + string_chunk[1] + " " + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("LABEL")) {
+        this.result = this.result.concat("label " + string_chunk[1] + " " + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("JUMP")) {
+        this.result = this.result.concat("jmp " + string_chunk[1] + " " + "\n");
+      } else if (string_chunk[0].equalsIgnoreCase("LEI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("GEI"))
+      else if (string_chunk[0].equalsIgnoreCase("GEI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("NEI"))
+      else if (string_chunk[0].equalsIgnoreCase("NEI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("EQI"))
+      else if (string_chunk[0].equalsIgnoreCase("EQI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("GTI"))
+      else if (string_chunk[0].equalsIgnoreCase("GTI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("LTI"))
+      else if (string_chunk[0].equalsIgnoreCase("LTI"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpi " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpi " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("LEF"))
+      else if (string_chunk[0].equalsIgnoreCase("LEF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jle " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jle " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("GEF"))
+      else if (string_chunk[0].equalsIgnoreCase("GEF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jge " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jge " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("NEF"))
+      else if (string_chunk[0].equalsIgnoreCase("NEF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jne " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jne " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("EQF"))
+      else if (string_chunk[0].equalsIgnoreCase("EQF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jeq " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jeq " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("GTF"))
+      else if (string_chunk[0].equalsIgnoreCase("GTF"))
       {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jgt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jgt " + string_chunk[3] + "\n");
         }
       }
-      else if (elements[0].equalsIgnoreCase("LTF")) {
-        if ((elements[1].contains("$T")) && (elements[2].contains("$T")))
+      else if (string_chunk[0].equalsIgnoreCase("LTF")) {
+        if ((string_chunk[1].contains("$T")) && (string_chunk[2].contains("$T")))
         {
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
-        else if (elements[1].contains("$T"))
+        else if (string_chunk[1].contains("$T"))
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + createTemp(string_chunk[1]) + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
-        else if (elements[2].contains("$T"))
+        else if (string_chunk[2].contains("$T"))
         {
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
         else
         {
-          this.result = this.result.concat("move " + elements[2] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("cmpr " + elements[1] + " " + createTemp(elements[2]) + "\n");
-          this.result = this.result.concat("jlt " + elements[3] + "\n");
+          this.result = this.result.concat("move " + string_chunk[2] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("cmpr " + string_chunk[1] + " " + createTemp(string_chunk[2]) + "\n");
+          this.result = this.result.concat("jlt " + string_chunk[3] + "\n");
         }
       }
     }

@@ -2,13 +2,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
-
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
  
  public class MyVisitor extends MicroBaseVisitor<NodeStructure>
  {
-   public ArrayList<String> outputList = new ArrayList<String>();
+   public ArrayList<String> output = new ArrayList<String>();
    public ArrayList<String> pushStack = new ArrayList<String>();
    private Stack<String> labelStack = new Stack<String>();
    private Stack<String> continueStack = new Stack<String>();
@@ -48,7 +46,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
          }
        } else {
          for (String key : scope.symbolMap.keySet()) {
-           if (((BuildNode)scope.symbolMap.get(key)).descriptor.isParameter)
+           if (((BuildNode)scope.symbolMap.get(key)).descriptor.query)
            {
              if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.INT) {
                varMap.put(key, new NodeStructure(createVar(true), 1));
@@ -77,9 +75,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
      }
    }
    
-   private String createVar(boolean isParameter)
+   private String createVar(boolean query)
    {
-     if (isParameter)
+     if (query)
      {
        this.paramIndex += 1;
        return "$P" + Integer.toString(this.paramIndex);
@@ -102,7 +100,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return (NodeStructure)((Map<?, ?>)this.tableMap.get(scopeName)).get(name);
    }
    
-   public NodeStructure visitPrimary(@NotNull MicroParser.PrimaryContext ctx)
+   public NodeStructure visitPrimary(MicroParser.PrimaryContext ctx)
    {
      if (ctx.expression() != null) {
        return (NodeStructure)visit(ctx.expression());
@@ -113,59 +111,59 @@ import org.antlr.v4.runtime.tree.ParseTree;
      if (ctx.INTLITERAL() != null)
      {
        NodeStructure newNode = new NodeStructure(createTemp(), 1);
-       this.outputList.add("STOREI " + ctx.INTLITERAL().getText() + " " + newNode.content);
+       this.output.add("STOREI " + ctx.INTLITERAL().getText() + " " + newNode.content);
        
        return newNode;
      }
      NodeStructure newNode = new NodeStructure(createTemp(), 2);
-     this.outputList.add("STOREF " + ctx.FLOATLITERAL().getText() + " " + newNode.content);
+     this.output.add("STOREF " + ctx.FLOATLITERAL().getText() + " " + newNode.content);
      
      return newNode;
    }
    
-   public NodeStructure visitFunction_declaration(@NotNull MicroParser.Function_declarationContext ctx)
+   public NodeStructure visitFunction_declaration(MicroParser.Function_declarationContext ctx)
    {
      ArrayList<String> newTempList = new ArrayList<String>();
      
-     this.outputList.add("LABEL " + ctx.name().getText());
+     this.output.add("LABEL " + ctx.name().getText());
      this.functionRecord = ctx.name().getText();
      this.tempMap.put(this.functionRecord, newTempList);
-     this.outputList.add("LINK ");
+     this.output.add("LINK ");
      visitChildren(ctx);
      this.tempIndex = 0;
      if (ctx.any_type().getText().equals("VOID")) {
-       this.outputList.add("RET");
+       this.output.add("RET");
      }
      return null;
    }
    
-   public NodeStructure visitExpression_call(@NotNull MicroParser.Expression_callContext ctx)
+   public NodeStructure visitExpression_call(MicroParser.Expression_callContext ctx)
    {
      this.functionPopNumberStack.push(Integer.valueOf(this.countPUSH));
      this.countPUSH = 0;
      if (ctx.expression_list() != null) {
        visit(ctx.expression_list());
      }
-     this.outputList.add("PUSH ");
+     this.output.add("PUSH ");
      String[] reverseList = new String[this.countPUSH];
      for (int i = 0; i < this.countPUSH; i++) {
        reverseList[i] = ((String)this.functionStack.pop());
      }
      for (int i = this.countPUSH - 1; i >= 0; i--) {
-       this.outputList.add("PUSH " + reverseList[i]);
+       this.output.add("PUSH " + reverseList[i]);
      }
-     this.outputList.add("JSR " + ctx.name().getText());
+     this.output.add("JSR " + ctx.name().getText());
      for (int i = 0; i < this.countPUSH; i++) {
-       this.outputList.add("POP ");
+       this.output.add("POP ");
      }
      this.countPUSH = ((Integer)this.functionPopNumberStack.pop()).intValue();
      
      NodeStructure newNode = new NodeStructure(createTemp(), ((Integer)this.functionMap.get(this.functionRecord)).intValue());
-     this.outputList.add("POP " + newNode.content);
+     this.output.add("POP " + newNode.content);
      return newNode;
    }
    
-   public NodeStructure visitExpression_list(@NotNull MicroParser.Expression_listContext ctx)
+   public NodeStructure visitExpression_list(MicroParser.Expression_listContext ctx)
    {
 	 ParseTree temp = (ParseTree)ctx.expression(); 
      NodeStructure exprNode = (NodeStructure)visit(temp);
@@ -180,7 +178,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return null;
    }
    
-   public NodeStructure visitExpression_list_repeat(@NotNull MicroParser.Expression_list_repeatContext ctx)
+   public NodeStructure visitExpression_list_repeat(MicroParser.Expression_list_repeatContext ctx)
    {
 	 ParseTree temp = (ParseTree)ctx.expression();
      NodeStructure exprNode = (NodeStructure)visit(temp);
@@ -194,25 +192,25 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return null;
    }
    
-   public NodeStructure visitRe_turn(@NotNull MicroParser.Re_turnContext ctx)
+   public NodeStructure visitRe_turn(MicroParser.Re_turnContext ctx)
    {
      NodeStructure exprNode = (NodeStructure)visit(ctx.expression());
      NodeStructure tempNode = new NodeStructure(createTemp(), exprNode.type);
      if (exprNode.type == 1)
      {
-       this.outputList.add("STOREI " + exprNode + " " + tempNode);
-       this.outputList.add("STOREI " + tempNode + " $R");
+       this.output.add("STOREI " + exprNode + " " + tempNode);
+       this.output.add("STOREI " + tempNode + " $R");
      }
      else
      {
-       this.outputList.add("STOREF " + exprNode + " " + tempNode);
-       this.outputList.add("STOREF " + tempNode + " $R");
+       this.output.add("STOREF " + exprNode + " " + tempNode);
+       this.output.add("STOREF " + tempNode + " $R");
      }
-     this.outputList.add("RET");
+     this.output.add("RET");
      return null;
    }
    
-   public NodeStructure visitParameter_declaration(@NotNull MicroParser.Parameter_declarationContext ctx)
+   public NodeStructure visitParameter_declaration(MicroParser.Parameter_declarationContext ctx)
    {
      if (ctx.variable_type().getText().equalsIgnoreCase("INT")) {
        new NodeStructure(ctx.name().getText(), 1);
@@ -222,7 +220,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return null;
    }
    
-   public NodeStructure visitExpression(@NotNull MicroParser.ExpressionContext ctx)
+   public NodeStructure visitExpression(MicroParser.ExpressionContext ctx)
    {
      if (!"".equals(ctx.pre_expression().getText()))
      {
@@ -239,7 +237,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return factorNode;
    }
    
-   public NodeStructure visitPre_expression(@NotNull MicroParser.Pre_expressionContext ctx)
+   public NodeStructure visitPre_expression(MicroParser.Pre_expressionContext ctx)
    {
      if (!"".equals(ctx.pre_expression().getText())) {
        visit(ctx.pre_expression());
@@ -252,7 +250,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return null;
    }
    
-   public NodeStructure visitFactor(@NotNull MicroParser.FactorContext ctx)
+   public NodeStructure visitFactor(MicroParser.FactorContext ctx)
    {
      if (!"".equals(ctx.pre_factor().getText()))
      {
@@ -268,7 +266,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return (NodeStructure)visit(ctx.post_expression());
    }
    
-   public NodeStructure visitPre_factor(@NotNull MicroParser.Pre_factorContext ctx)
+   public NodeStructure visitPre_factor(MicroParser.Pre_factorContext ctx)
    {
      if (!"".equals(ctx.pre_factor().getText())) {
        visit(ctx.pre_factor());
@@ -281,69 +279,70 @@ import org.antlr.v4.runtime.tree.ParseTree;
      return null;
    }
    
-   public NodeStructure visitWrite(@NotNull MicroParser.WriteContext ctx)
+   public NodeStructure visitWrite(MicroParser.WriteContext ctx)
    {
      String[] idArray = ctx.name_list().getText().split(",");
      for (int i = 0; i < idArray.length; i++)
      {
        NodeStructure newNode = findIdNode(idArray[i], this.functionRecord);
        if (newNode.type == 1) {
-         this.outputList.add("WRITEI " + newNode.content);
+         this.output.add("WRITEI " + newNode.content);
        } else if (newNode.type == 5) {
-         this.outputList.add("WRITES " + newNode.content);
+         this.output.add("WRITES " + newNode.content);
        } else {
-         this.outputList.add("WRITEF " + newNode.content);
+         this.output.add("WRITEF " + newNode.content);
        }
      }
      return null;
    }
    
-   public NodeStructure visitRead(@NotNull MicroParser.ReadContext ctx)
+   public NodeStructure visitRead(MicroParser.ReadContext ctx)
    {
      String[] idArray = ctx.name_list().getText().split(",");
      for (int i = 0; i < idArray.length; i++)
      {
        NodeStructure newNode = findIdNode(idArray[i], this.functionRecord);
        if (newNode.type == 1) {
-         this.outputList.add("READI " + newNode.content);
+         this.output.add("READI " + newNode.content);
        } else {
-         this.outputList.add("READF " + newNode.content);
+         this.output.add("READF " + newNode.content);
        }
      }
      return null;
    }
    
-   public NodeStructure visitAssignment_frame(@NotNull MicroParser.Assignment_frameContext ctx)
+   public NodeStructure visitAssignment_frame(MicroParser.Assignment_frameContext ctx)
    {
      NodeStructure exprNode = (NodeStructure)visit(ctx.expression());
      NodeStructure newNode = findIdNode(ctx.name().getText(), this.functionRecord);
      if (newNode.type == 1) {
-       this.outputList.add("STOREI " + exprNode.content + " " + newNode.content);
+       this.output.add("STOREI " + exprNode.content + " " + newNode.content);
      } else {
-       this.outputList.add("STOREF " + exprNode.content + " " + newNode.content);
+       this.output.add("STOREF " + exprNode.content + " " + newNode.content);
      }
      return null;
    }
    
-   public NodeStructure visitWhile_statement(@NotNull MicroParser.While_statementContext ctx)
+   public NodeStructure visitWhile_statement(MicroParser.While_statementContext ctx)
    {
      String newLabel = createLabel();
-     this.outputList.add("LABEL " + newLabel);
+     this.output.add("LABEL " + newLabel);
      String newLabel2 = createLabel();
      this.labelStack.add(newLabel2);
      NodeStructure comp = (NodeStructure)visit(ctx.condition());
      
      this.continueStack.push("JUMP " + newLabel);
      this.breakStack.push("JUMP " + newLabel2);
-     this.outputList.add(comp.content + " " + newLabel2);
-     this.outputList.add("JUMP " + newLabel);
-     this.outputList.add("LABEL " + newLabel2);
+     this.output.add(comp.content + " " + newLabel2);
+     visit(ctx.statement_list());
+     this.output.add("JUMP " + newLabel);
+     this.output.add("LABEL " + newLabel2);
      this.breakStack.pop();
      this.continueStack.pop();
      return null;
    }
    
-   public NodeStructure visitIf_statement(@NotNull MicroParser.If_statementContext ctx)
+   public NodeStructure visitIf_statement(MicroParser.If_statementContext ctx)
    {
      if (!"".equals(ctx.else_portion().getText()))
      {
@@ -357,19 +356,19 @@ import org.antlr.v4.runtime.tree.ParseTree;
          String newLabel2 = createLabel();
          this.labelStack.push(newLabel2);
          visit(ctx.else_portion());
-         this.outputList.add("LABEL " + newLabel2);
+         this.output.add("LABEL " + newLabel2);
        }
        else
        {
          String newLabel = createLabel();
-         this.outputList.add(comp.content + " " + newLabel);
+         this.output.add(comp.content + " " + newLabel);
          visit(ctx.statement_list());
          String newLabel2 = createLabel();
          this.labelStack.push(newLabel2);
-         this.outputList.add("JUMP " + newLabel2);
-         this.outputList.add("LABEL " + newLabel);
+         this.output.add("JUMP " + newLabel2);
+         this.output.add("LABEL " + newLabel);
          visit(ctx.else_portion());
-         this.outputList.add("LABEL " + newLabel2);
+         this.output.add("LABEL " + newLabel2);
        }
      }
      else
@@ -382,21 +381,21 @@ import org.antlr.v4.runtime.tree.ParseTree;
        else if (!comp.content.equalsIgnoreCase("FALSE"))
        {
          String newLabel2 = createLabel();
-         this.outputList.add(comp.content + " " + newLabel2);
+         this.output.add(comp.content + " " + newLabel2);
          visit(ctx.statement_list());
-         this.outputList.add("LABEL " + newLabel2);
+         this.output.add("LABEL " + newLabel2);
        }
      }
      return null;
    }
    
-   public NodeStructure visitElse_portion(@NotNull MicroParser.Else_portionContext ctx)
+   public NodeStructure visitElse_portion(MicroParser.Else_portionContext ctx)
    {
      visit(ctx.statement_list());
      return null;
    }
    
-   public NodeStructure visitCondition(@NotNull MicroParser.ConditionContext ctx)
+   public NodeStructure visitCondition(MicroParser.ConditionContext ctx)
    {
      NodeStructure op1 = (NodeStructure)visit(ctx.expression(0));
      
@@ -407,91 +406,79 @@ import org.antlr.v4.runtime.tree.ParseTree;
    
    public String resolveDoComp(String input)
    {
-     if (input.contains("GEI")) {
-       return input.replace("GEI", "LTI");
-     }
-     if (input.contains("LEI")) {
-       return input.replace("LEI", "GTI");
-     }
-     if (input.contains("NEI")) {
-       return input.replace("NEI", "EQI");
-     }
-     if (input.contains("EQI")) {
-       return input.replace("EQI", "NEI");
-     }
-     if (input.contains("GTI")) {
-       return input.replace("GTI", "LEI");
-     }
-     if (input.contains("LTI")) {
-       return input.replace("LTI", "GEI");
-     }
-     if (input.contains("GEF")) {
-       return input.replace("GEF", "LTF");
-     }
-     if (input.contains("LEF")) {
-       return input.replace("LEF", "GTF");
-     }
-     if (input.contains("NEF")) {
-       return input.replace("NEF", "EQF");
-     }
-     if (input.contains("EQF")) {
-       return input.replace("EQF", "NEF");
-     }
-     if (input.contains("GTF")) {
-       return input.replace("GTF", "LEF");
-     }
-     if (input.contains("LTF")) {
-       return input.replace("LTF", "GEF");
-     }
-     System.out.println("ERROR @ resolveDoComp");
-     return null;
+	   switch(input)
+	   {
+	   	case("GEI"):
+	   		return input.replace("GEI", "LTI");
+		case("LEI"):
+			return input.replace("LEI", "GTI");
+		case("NEI"):
+			return input.replace("NEI", "EQI");
+		case("EQI"):
+			return input.replace("EQI", "NEI");
+		case("GTI"):
+			return input.replace("GTI", "LEI");
+		case("LTI"):
+			return input.replace("LTI", "GEI");
+		case("GEF"):
+			  return input.replace("GEF", "LTF");
+		case("LEF"):
+			return input.replace("LEF", "GTF");
+		case("NEF"):
+			return input.replace("NEF", "EQF");
+		case("EQF"):
+			return input.replace("EQF", "NEF");
+		case("GTF"):
+			return input.replace("GTF", "LEF");
+		case("LTF"):
+			return input.replace("LTF", "GEF");
+		default:
+			return null;
+	   }
    }
    
-   public NodeStructure resolveComp(NodeStructure op1, NodeStructure op2, String op)
+   public NodeStructure resolveComp(NodeStructure left_variable, NodeStructure right_variable, String operation)
    {
-     if ((op1.type == 1) && (op2.type == 1))
+     if ((left_variable.type == 1) && (right_variable.type == 1))
      {
-       if (op.equalsIgnoreCase("<")) {
-         return new NodeStructure("GEI " + op1.content + " " + op2.content, 4);
-       }
-       if (op.equalsIgnoreCase(">")) {
-         return new NodeStructure("LEI " + op1.content + " " + op2.content, 4);
-       }
-       if (op.equalsIgnoreCase("=")) {
-         return new NodeStructure("NEI " + op1.content + " " + op2.content, 4);
-       }
-       if (op.equalsIgnoreCase("!=")) {
-         return new NodeStructure("EQI " + op1.content + " " + op2.content, 4);
-       }
-       if (op.equalsIgnoreCase("<=")) {
-         return new NodeStructure("GTI " + op1.content + " " + op2.content, 4);
-       }
-       if (op.equalsIgnoreCase(">=")) {
-         return new NodeStructure("LTI " + op1.content + " " + op2.content, 4);
-       }
-       System.out.println("ERROR @ resolveComp");
-       return null;
+    	 switch(operation)
+    	 {
+    	 	case("<"):
+    	 		return new NodeStructure("GEI " + left_variable.content + " " + right_variable.content, 4);
+    	 	case(">"):
+    	 		return new NodeStructure("LEI " + left_variable.content + " " + right_variable.content, 4);
+    	 	case("="):
+    	 		return new NodeStructure("NEI " + left_variable.content + " " + right_variable.content, 4);
+    	 	case("!="):
+    	 		return new NodeStructure("EQI " + left_variable.content + " " + right_variable.content, 4);
+    	 	case("<="):
+    	 		return new NodeStructure("GTI " + left_variable.content + " " + right_variable.content, 4);
+    	 	case(">="):
+    	 		return new NodeStructure("LTI " + left_variable.content + " " + right_variable.content, 4);
+    	 	default:
+    	 		return null;
+    	 }
      }
-     if (op.equalsIgnoreCase("<")) {
-       return new NodeStructure("GEF " + op1.content + " " + op2.content, 4);
+     else
+     {
+    	 switch(operation)
+    	 {
+    	 	case("<"):
+    	 		return new NodeStructure("GEF " + left_variable.content + " " + right_variable.content, 4);
+	    	case(">"):
+	    		return new NodeStructure("LEF " + left_variable.content + " " + right_variable.content, 4);
+	    	case("="):
+	    		return new NodeStructure("NEF " + left_variable.content + " " + right_variable.content, 4);
+	      	case("!="):
+	      		return new NodeStructure("EQF " + left_variable.content + " " + right_variable.content, 4);
+	    	case("<="):
+	    		return new NodeStructure("GTF " + left_variable.content + " " + right_variable.content, 4);
+	      	case(">="):
+	      		return new NodeStructure("LTF " + left_variable.content + " " + right_variable.content, 4);
+	      	default:
+	      		return null;
+    	 }
      }
-     if (op.equalsIgnoreCase(">")) {
-       return new NodeStructure("LEF " + op1.content + " " + op2.content, 4);
-     }
-     if (op.equalsIgnoreCase("=")) {
-       return new NodeStructure("NEF " + op1.content + " " + op2.content, 4);
-     }
-     if (op.equalsIgnoreCase("!=")) {
-       return new NodeStructure("EQF " + op1.content + " " + op2.content, 4);
-     }
-     if (op.equalsIgnoreCase("<=")) {
-       return new NodeStructure("GTF " + op1.content + " " + op2.content, 4);
-     }
-     if (op.equalsIgnoreCase(">=")) {
-       return new NodeStructure("LTF " + op1.content + " " + op2.content, 4);
-     }
-     System.out.println("ERROR @ resolveComp");
-     return null;
    }
    
    public String createLabel()
@@ -506,85 +493,88 @@ import org.antlr.v4.runtime.tree.ParseTree;
      if (this.tempIndex > this.finalTempIndex) {
        this.finalTempIndex = this.tempIndex;
      }
-     ((ArrayList)this.tempMap.get(this.functionRecord)).add("$T" + Integer.toString(this.tempIndex));
+     ((ArrayList<String>)this.tempMap.get(this.functionRecord)).add("$T" + Integer.toString(this.tempIndex));
      return "$T" + Integer.toString(this.tempIndex);
    }
    
    public NodeStructure resolve(ArrayList<NodeStructure> input)
-   {
-     while (input.size() >= 3)
-     {
-       NodeStructure op1 = (NodeStructure)input.get(0);
-       NodeStructure op = (NodeStructure)input.get(1);
-       NodeStructure op2 = (NodeStructure)input.get(2);
-       
-       NodeStructure newNode = new NodeStructure(createTemp(), op1.type);
-       if (op.content.equalsIgnoreCase("+"))
-       {
-         if (op1.type == 1)
-         {
-           String output = "ADDI " + op1.content + " " + op2.content + " " + newNode.content;
-           this.outputList.add(output);
-         }
-         else
-         {
-           String output = "ADDF " + op1.content + " " + op2.content + " " + newNode.content;
-           this.outputList.add(output);
-         }
-       }
-       else if (op.content.equalsIgnoreCase("-"))
-       {
-         if (op1.type == 1)
-         {
-           String output = "SUBI " + op1.content + " " + op2.content + " " + newNode.content;
-           this.outputList.add(output);
-         }
-         else
-         {
-           String output = "SUBF " + op1.content + " " + op2.content + " " + newNode.content;
-           this.outputList.add(output);
-         }
-       }
-       else if (op.content.equalsIgnoreCase("*"))
-       {
-         if (op1.type == 1)
-         {
-           String output = "MULTI " + op1.content + " " + op2.content + " " + newNode.content;
-           this.outputList.add(output);
-         }
-         else
-         {
-           String output = "MULTF " + op1.content + " " + op2.content + " " + newNode.content;
-           this.outputList.add(output);
-         }
-       }
-       else if (op1.type == 1)
-       {
-         String output = "DIVI " + op1.content + " " + op2.content + " " + newNode.content;
-         this.outputList.add(output);
-       }
-       else
-       {
-         String output = "DIVF " + op1.content + " " + op2.content + " " + newNode.content;
-         this.outputList.add(output);
-       }
-       input.remove(0);
-       input.remove(0);
-       input.remove(0);
-       
-       input.add(0, newNode);
-     }
-     NodeStructure returnValue = (NodeStructure)input.get(0);
-     input.removeAll(input);
-     return returnValue;
-   }
+	  {
+	    while (input.size() >= 3)
+	    {
+	      NodeStructure left_variable = (NodeStructure)input.get(0);
+	      NodeStructure operation = (NodeStructure)input.get(1);
+	      NodeStructure right_operation = (NodeStructure)input.get(2);
+	      
+	      NodeStructure newNode = new NodeStructure(createTemp(), left_variable.type);
+	      switch(operation.content)
+	      {
+	      	case("+"):
+	      		if (left_variable.type == 1)
+	      		{
+	      			String output = "ADDI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	      			this.output.add(output);
+	      		}
+	      		else
+	      		{
+	      			String output = "ADDF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	      			this.output.add(output);
+	      		}
+	      	break;
+	      	case("-"):
+	      		if (left_variable.type == 1)
+	      		{
+	      			String output = "SUBI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	      			this.output.add(output);
+	      		}
+	      		else
+	      		{
+	      			String output = "SUBF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	      			this.output.add(output);
+	      		}
+	      	break;
+	        case("*"):
+	        	if (left_variable.type == 1)
+	        	{
+	        		String output = "MULTI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	        		this.output.add(output);
+	        	}
+	        	else
+	        	{
+	        		String output = "MULTF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	        		this.output.add(output);
+	        	}
+	        break;
+	        case("/"):
+	        	if (left_variable.type == 1)
+	        	{
+	        		String output = "DIVI " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	        		this.output.add(output);
+	        	}
+	        	else
+	        	{
+	        		String output = "DIVF " + left_variable.content + " " + right_operation.content + " " + newNode.content;
+	        		this.output.add(output);
+	        	}
+	        break;
+	      }
+	      for(int a = 0; a < 3; a++)
+	      {
+	    	  input.remove(0);
+	      }
+	      
+	      input.add(0, newNode);
+	    }
+	    NodeStructure returnValue = (NodeStructure)input.get(0);
+	    input.removeAll(input);
+	    return returnValue;
+	  }
    
    public String printOutput()
    {
      String result = "";
-     for (int i = 0; i < this.outputList.size(); i++)
+     for (int i = 0; i < this.output.size(); i++)
      {
-       result = result + (String)this.outputList.get(i);
+       result = result + (String)this.output.get(i);
        result = result + "\n";
      }
      return result;

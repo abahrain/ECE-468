@@ -1,7 +1,7 @@
 class Quantifier
 {
   String content = "default";
-  boolean isParameter = false;
+  boolean query = false;
   
   public Quantifier(String input)
   {
@@ -10,7 +10,7 @@ class Quantifier
   
   public Quantifier(boolean justify)
   {
-    this.isParameter = justify;
+    this.query = justify;
   }
   
   public Quantifier() {}
