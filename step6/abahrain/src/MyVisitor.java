@@ -2,8 +2,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
-import org.antlr.v4.runtime.tree.ParseTree;
- 
+import org.antlr.v4.runtime.tree.*;
+
  public class MyVisitor extends MicroBaseVisitor<NodeStructure>
  {
    public ArrayList<String> output = new ArrayList<String>();
@@ -165,15 +165,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
    
    public NodeStructure visitExpression_list(MicroParser.Expression_listContext ctx)
    {
-	 ParseTree temp = (ParseTree)ctx.expression(); 
-     NodeStructure exprNode = (NodeStructure)visit(temp);
+	 NodeStructure exprNode = (NodeStructure) visit((ParseTree) ctx.expression());
      
- 
      this.functionStack.push(exprNode.content);
      this.countPUSH += 1;
-     temp = (ParseTree)ctx.expression_list_repeat();
-     if (!"".equals(temp.getText())) {
-       visit(temp);
+     if (!"".equals(((ParseTree) ctx.expression_list_repeat()).getText())) {
+       visit((ParseTree) (ctx.expression_list_repeat()));
      }
      return null;
    }

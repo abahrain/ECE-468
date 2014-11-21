@@ -28,7 +28,7 @@ public class Micro
 		//System.out.println(tree.toStringTree(parse));
 		MyVisitor visited = new MyVisitor(listen.table, listen.functionMap);
 		visited.visit(tree);
-		System.out.print(new TinyDancer(visited.output, listen.table));
+		System.out.print(new TinyDancer(visited.output, listen.table, visited.tableMap, visited.tempMap, 1000));
 		//System.out.println("BOOM!");
 		/*JFrame frame = new JFrame("Antlr AST");
         JPanel panel = new JPanel();

@@ -1,10 +1,12 @@
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Stack;
 
-public class TinyDancer
+public class IRToTiny
 {
-  private ArrayList<String> Intermediate_Representation;
+  private ArrayList<String> IR;
   private String result = "";
   private int registerNumber;
   private SymbolTable table;
@@ -13,14 +15,14 @@ public class TinyDancer
   private String labelIndicator = null;
   private int count = 0;
   private int RPosition = 0;
-  protected Map<String, Map<String, String>> TR = new LinkedHashMap<>();
-  protected Map<String, Map<String, NodeStructure>> tableMap = new LinkedHashMap<>();
-  protected Map<String, Integer> linkCount = new LinkedHashMap<>();
-  protected Map<String, ArrayList<String>> tempMap = new LinkedHashMap<>();
+  protected Map<String, Map<String, String>> TR = new LinkedHashMap();
+  protected Map<String, Map<String, Node>> tableMap = new LinkedHashMap();
+  protected Map<String, Integer> linkCount = new LinkedHashMap();
+  protected Map<String, ArrayList<String>> tempMap = new LinkedHashMap();
   
-  public TinyDancer(ArrayList<String> input, SymbolTable table, Map<String, Map<String, NodeStructure>> inputMap, Map<String, ArrayList<String>> tempMap, int registerNumber)
+  public IRToTiny(ArrayList<String> input, SymbolTable table, Map<String, Map<String, Node>> inputMap, Map<String, ArrayList<String>> tempMap, int registerNumber)
   {
-    this.Intermediate_Representation = input;
+    this.IR = input;
     this.table = table;
     this.registerNumber = registerNumber;
     this.paramIndex = (registerNumber + 1);
@@ -29,11 +31,11 @@ public class TinyDancer
     this.tempMap = tempMap;
     for (String key : this.tableMap.keySet())
     {
-      Map<String, String> newTR = new LinkedHashMap<>();
+      Map<String, String> newTR = new LinkedHashMap();
       for (int i = 1; i <= registerNumber; i++) {
         newTR.put("$T" + Integer.toString(i), "r" + Integer.toString(i - 1));
       }
-      for (NodeStructure each : (this.tableMap.get(key)).values()) //removed mapped cast
+      for (Node each : ((Map)this.tableMap.get(key)).values())
       {
         if ((each.content.contains("$P")) && (!this.TR.containsKey(each.content)))
         {
@@ -62,9 +64,9 @@ public class TinyDancer
     this.result = this.result.concat(";tiny code\n");
     initialGlobal();
     initailMain();
-    for (int i = 0; i < this.Intermediate_Representation.size(); i++)
+    for (int i = 0; i < this.IR.size(); i++)
     {
-      String[] elements = ((String)this.Intermediate_Representation.get(i)).split(" ");
+      String[] elements = ((String)this.IR.get(i)).split(" ");
       if (elements[0].equalsIgnoreCase("STOREI"))
       {
         if ((elements[1].contains("$")) && (elements[2].contains("$")))
@@ -342,8 +344,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -375,8 +377,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -408,8 +410,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -441,8 +443,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -474,8 +476,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -507,8 +509,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpi " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -540,8 +542,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -573,8 +575,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -606,8 +608,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -639,8 +641,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -672,8 +674,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -705,8 +707,8 @@ public class TinyDancer
         {
           if ((elements[1].contains("$P")) || (elements[1].contains("$L")) || (elements[2].contains("$P")) || (elements[2].contains("$L")))
           {
-            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
-            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList<String>)this.tempMap.get(this.labelIndicator)).get(((ArrayList<String>)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("move " + createTemp(elements[2]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
+            this.result = this.result.concat("cmpr " + createTemp(elements[1]) + " " + createTemp(shiftToUnusedR((String)((ArrayList)this.tempMap.get(this.labelIndicator)).get(((ArrayList)this.tempMap.get(this.labelIndicator)).size() - 1))) + "\n");
           }
           else
           {
@@ -793,22 +795,22 @@ public class TinyDancer
   
   public void IRcodeComment()
   {
-    for (int i = 0; i < this.Intermediate_Representation.size(); i++) {
-      this.result = this.result.concat(";" + (String)this.Intermediate_Representation.get(i) + "\n");
+    for (int i = 0; i < this.IR.size(); i++) {
+      this.result = this.result.concat(";" + (String)this.IR.get(i) + "\n");
     }
   }
   
   public void initialGlobal()
   {
-    for (Boresight scope : this.table.scopeStack.subList(0, this.table.scopeStack.size())) {
+    for (Scope scope : this.table.scopeStack.subList(0, this.table.scopeStack.size())) {
       if (scope.type.equalsIgnoreCase("GLOBAL")) {
         for (String key : scope.symbolMap.keySet()) {
-          if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.INT) {
+          if (((Symbol)scope.symbolMap.get(key)).type == ValueType.INT) {
             this.result = this.result.concat("var " + key + "\n");
-          } else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.FLOAT) {
+          } else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.FLOAT) {
             this.result = this.result.concat("var " + key + "\n");
-          } else if (((BuildNode)scope.symbolMap.get(key)).type == VariableType.STRING) {
-            this.result = this.result.concat("str " + key + " " + ((BuildNode)scope.symbolMap.get(key)).descriptor.content + "\n");
+          } else if (((Symbol)scope.symbolMap.get(key)).type == ValueType.STRING) {
+            this.result = this.result.concat("str " + key + " " + ((Symbol)scope.symbolMap.get(key)).descriptor.content + "\n");
           }
         }
       }
@@ -817,8 +819,8 @@ public class TinyDancer
   
   public String createTemp(String temp)
   {
-    if (((Map<?,?>)this.TR.get(this.labelIndicator)).containsKey(temp)) {
-      return (String)((Map<?,?>)this.TR.get(this.labelIndicator)).get(temp);
+    if (((Map)this.TR.get(this.labelIndicator)).containsKey(temp)) {
+      return (String)((Map)this.TR.get(this.labelIndicator)).get(temp);
     }
     return null;
   }
