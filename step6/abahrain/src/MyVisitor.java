@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
-import org.antlr.v4.runtime.tree.*;
 
  public class MyVisitor extends MicroBaseVisitor<NodeStructure>
  {
@@ -165,26 +164,24 @@ import org.antlr.v4.runtime.tree.*;
    
    public NodeStructure visitExpression_list(MicroParser.Expression_listContext ctx)
    {
-	 NodeStructure exprNode = (NodeStructure) visit((ParseTree) ctx.expression());
+	 NodeStructure exprNode = (NodeStructure) visit(ctx.expression());
      
      this.functionStack.push(exprNode.content);
      this.countPUSH += 1;
-     if (!"".equals(((ParseTree) ctx.expression_list_repeat()).getText())) {
-       visit((ParseTree) (ctx.expression_list_repeat()));
+     if (!"".equals(ctx.expression_list_repeat().getText())) {
+       visit((ctx.expression_list_repeat()));
      }
      return null;
    }
    
    public NodeStructure visitExpression_list_repeat(MicroParser.Expression_list_repeatContext ctx)
    {
-	 ParseTree temp = (ParseTree)ctx.expression();
-     NodeStructure exprNode = (NodeStructure)visit(temp);
+	 NodeStructure exprNode = (NodeStructure)visit(ctx.expression());
      
      this.functionStack.push(exprNode.content);
      this.countPUSH += 1;
-     temp = (ParseTree)ctx.expression_list_repeat();
-     if (!"".equals(temp.getText())) {
-       visit(temp);
+     if (!"".equals(ctx.expression_list_repeat().getText())) {
+       visit(ctx.expression_list_repeat());
      }
      return null;
    }

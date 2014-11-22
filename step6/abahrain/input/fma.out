@@ -1,0 +1,621 @@
+;IR code
+;LABEL add
+;LINK 
+;ADDF $P1 $P2 $T1
+;STOREF $T1 $L1
+;STOREF $L1 $T2
+;STOREF $T2 $R
+;RET
+;LABEL multiply
+;LINK 
+;MULTF $P1 $P2 $T1
+;STOREF $T1 $L1
+;STOREF $L1 $T2
+;STOREF $T2 $R
+;RET
+;LABEL main
+;LINK 
+;WRITES intro
+;WRITES first
+;READF $L1
+;WRITES second
+;READF $L2
+;WRITES third
+;READF $L3
+;PUSH 
+;PUSH $L1
+;PUSH $L2
+;JSR multiply
+;POP 
+;POP 
+;POP $T1
+;STOREF $T1 $L5
+;PUSH 
+;PUSH $L5
+;PUSH $L3
+;JSR add
+;POP 
+;POP 
+;POP $T2
+;STOREF $T2 $L4
+;WRITEF $L1
+;WRITES star
+;WRITEF $L2
+;WRITES plus
+;WRITEF $L3
+;WRITES equal
+;WRITEF $L4
+;WRITES eol
+;STOREI 0 $T3
+;STOREI $T3 $T4
+;STOREI $T4 $R
+;RET
+;tiny code
+str intro "You will be asked for three float numbers\n"
+str first "Please enter the first float number: "
+str second "Please enter the second float number: "
+str third "Please enter the third float number: "
+str eol "\n"
+str star "*"
+str plus "+"
+str equal "="
+push
+push r0
+push r1
+push r2
+push r3
+push r4
+push r5
+push r6
+push r7
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+push r16
+push r17
+push r18
+push r19
+push r20
+push r21
+push r22
+push r23
+push r24
+push r25
+push r26
+push r27
+push r28
+push r29
+push r30
+push r31
+push r32
+push r33
+push r34
+push r35
+push r36
+push r37
+push r38
+push r39
+push r40
+push r41
+push r42
+push r43
+push r44
+push r45
+push r46
+push r47
+push r48
+push r49
+push r50
+push r51
+push r52
+push r53
+push r54
+push r55
+push r56
+push r57
+push r58
+push r59
+push r60
+push r61
+push r62
+push r63
+push r64
+push r65
+push r66
+push r67
+push r68
+push r69
+push r70
+push r71
+push r72
+push r73
+push r74
+push r75
+push r76
+push r77
+push r78
+push r79
+push r80
+push r81
+push r82
+push r83
+push r84
+push r85
+push r86
+push r87
+push r88
+push r89
+push r90
+push r91
+push r92
+push r93
+push r94
+push r95
+push r96
+push r97
+push r98
+push r99
+jsr main
+sys halt
+label add 
+link 1
+move $102 r0
+addr $103 r0
+move r0 $-1
+move $-1 r1
+move r1 $104
+unlnk
+ret
+label multiply 
+link 1
+move $102 r0
+mulr $103 r0
+move r0 $-1
+move $-1 r1
+move r1 $104
+unlnk
+ret
+label main 
+link 5
+sys writes intro
+sys writes first
+sys readr $-1 
+sys writes second
+sys readr $-2 
+sys writes third
+sys readr $-3 
+push
+push $-1
+push $-2
+push r0
+push r1
+push r2
+push r3
+push r4
+push r5
+push r6
+push r7
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+push r16
+push r17
+push r18
+push r19
+push r20
+push r21
+push r22
+push r23
+push r24
+push r25
+push r26
+push r27
+push r28
+push r29
+push r30
+push r31
+push r32
+push r33
+push r34
+push r35
+push r36
+push r37
+push r38
+push r39
+push r40
+push r41
+push r42
+push r43
+push r44
+push r45
+push r46
+push r47
+push r48
+push r49
+push r50
+push r51
+push r52
+push r53
+push r54
+push r55
+push r56
+push r57
+push r58
+push r59
+push r60
+push r61
+push r62
+push r63
+push r64
+push r65
+push r66
+push r67
+push r68
+push r69
+push r70
+push r71
+push r72
+push r73
+push r74
+push r75
+push r76
+push r77
+push r78
+push r79
+push r80
+push r81
+push r82
+push r83
+push r84
+push r85
+push r86
+push r87
+push r88
+push r89
+push r90
+push r91
+push r92
+push r93
+push r94
+push r95
+push r96
+push r97
+push r98
+push r99
+jsr multiply
+pop r99
+pop r98
+pop r97
+pop r96
+pop r95
+pop r94
+pop r93
+pop r92
+pop r91
+pop r90
+pop r89
+pop r88
+pop r87
+pop r86
+pop r85
+pop r84
+pop r83
+pop r82
+pop r81
+pop r80
+pop r79
+pop r78
+pop r77
+pop r76
+pop r75
+pop r74
+pop r73
+pop r72
+pop r71
+pop r70
+pop r69
+pop r68
+pop r67
+pop r66
+pop r65
+pop r64
+pop r63
+pop r62
+pop r61
+pop r60
+pop r59
+pop r58
+pop r57
+pop r56
+pop r55
+pop r54
+pop r53
+pop r52
+pop r51
+pop r50
+pop r49
+pop r48
+pop r47
+pop r46
+pop r45
+pop r44
+pop r43
+pop r42
+pop r41
+pop r40
+pop r39
+pop r38
+pop r37
+pop r36
+pop r35
+pop r34
+pop r33
+pop r32
+pop r31
+pop r30
+pop r29
+pop r28
+pop r27
+pop r26
+pop r25
+pop r24
+pop r23
+pop r22
+pop r21
+pop r20
+pop r19
+pop r18
+pop r17
+pop r16
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+pop r7
+pop r6
+pop r5
+pop r4
+pop r3
+pop r2
+pop r1
+pop r0
+pop
+pop
+pop r0
+move r0 $-5
+push
+push $-5
+push $-3
+push r0
+push r1
+push r2
+push r3
+push r4
+push r5
+push r6
+push r7
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+push r16
+push r17
+push r18
+push r19
+push r20
+push r21
+push r22
+push r23
+push r24
+push r25
+push r26
+push r27
+push r28
+push r29
+push r30
+push r31
+push r32
+push r33
+push r34
+push r35
+push r36
+push r37
+push r38
+push r39
+push r40
+push r41
+push r42
+push r43
+push r44
+push r45
+push r46
+push r47
+push r48
+push r49
+push r50
+push r51
+push r52
+push r53
+push r54
+push r55
+push r56
+push r57
+push r58
+push r59
+push r60
+push r61
+push r62
+push r63
+push r64
+push r65
+push r66
+push r67
+push r68
+push r69
+push r70
+push r71
+push r72
+push r73
+push r74
+push r75
+push r76
+push r77
+push r78
+push r79
+push r80
+push r81
+push r82
+push r83
+push r84
+push r85
+push r86
+push r87
+push r88
+push r89
+push r90
+push r91
+push r92
+push r93
+push r94
+push r95
+push r96
+push r97
+push r98
+push r99
+jsr add
+pop r99
+pop r98
+pop r97
+pop r96
+pop r95
+pop r94
+pop r93
+pop r92
+pop r91
+pop r90
+pop r89
+pop r88
+pop r87
+pop r86
+pop r85
+pop r84
+pop r83
+pop r82
+pop r81
+pop r80
+pop r79
+pop r78
+pop r77
+pop r76
+pop r75
+pop r74
+pop r73
+pop r72
+pop r71
+pop r70
+pop r69
+pop r68
+pop r67
+pop r66
+pop r65
+pop r64
+pop r63
+pop r62
+pop r61
+pop r60
+pop r59
+pop r58
+pop r57
+pop r56
+pop r55
+pop r54
+pop r53
+pop r52
+pop r51
+pop r50
+pop r49
+pop r48
+pop r47
+pop r46
+pop r45
+pop r44
+pop r43
+pop r42
+pop r41
+pop r40
+pop r39
+pop r38
+pop r37
+pop r36
+pop r35
+pop r34
+pop r33
+pop r32
+pop r31
+pop r30
+pop r29
+pop r28
+pop r27
+pop r26
+pop r25
+pop r24
+pop r23
+pop r22
+pop r21
+pop r20
+pop r19
+pop r18
+pop r17
+pop r16
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+pop r7
+pop r6
+pop r5
+pop r4
+pop r3
+pop r2
+pop r1
+pop r0
+pop
+pop
+pop r1
+move r1 $-4
+sys writer $-1 
+sys writes star
+sys writer $-2 
+sys writes plus
+sys writer $-3 
+sys writes equal
+sys writer $-4 
+sys writes eol
+move 0 r2
+move r2 r3
+move r3 $101
+unlnk
+ret
+end
